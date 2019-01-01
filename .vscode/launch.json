@@ -1,0 +1,20 @@
+
+
+
+{
+    "version": "0.1.0",
+    "command": "dotnet",
+    "isShellCommand": true,
+    "args": [],
+    "options":  {
+        "cwd": "C:/Users/ATM PROJEKT/Dropbox/App/Live/bin/Debug/netcoreapp2.0/Live.dll"
+    },
+    "tasks": [
+        {
+            "taskName": "build",
+            "args": [ ],
+            "isBuildCommand": true,
+            "problemMatcher": "$msCompile"
+        }
+    ]
+}
