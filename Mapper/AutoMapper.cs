@@ -22,7 +22,14 @@ namespace Live.Mapper
                 .ForMember(d => d.videoId  , s => s.MapFrom(x => x.YouTubeId))
                 .ForMember(d => d.count  , s => s.MapFrom(x => x.Count))
                 .ForMember(d => d.top  , s => s.MapFrom(x => Regex.Replace(x.top_, @"\,+", "."))) 
-                .ForMember(d => d.left  , s => s.MapFrom(x => Regex.Replace(x.left_, @"\,+", "."))); 
+                .ForMember(d => d.left  , s => s.MapFrom(x => Regex.Replace(x.left_, @"\,+", ".")));
+
+            config.CreateMap<ArchiveSong, SongDto>()
+                .ForMember(d => d.title, s => s.MapFrom(x => x.Name))
+                .ForMember(d => d.videoId  , s => s.MapFrom(x => x.YouTube.VideoID))
+                .ForMember(d => d.count  , opt => opt.MapFrom(src => "1"))
+                .ForMember(d => d.top  , s => s.MapFrom(x => x.YouTube.top_))
+                .ForMember(d => d.left  , s => s.MapFrom(x => x.YouTube.left_));
         }
         ).CreateMapper();
 

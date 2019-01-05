@@ -36,9 +36,10 @@ namespace Live
             
             services.AddMvc().AddJsonOptions(j => j.SerializerSettings.Formatting = Newtonsoft.Json.Formatting.Indented);
             services.AddScoped<IRadioSongRepository, RadioSongRepository>();
+            services.AddScoped<ISongsRepository, SongsRepository>();
             services.AddSingleton(AutoMapperConfig.Initialize());
             services.AddSingleton(sql_connection);
-             services.AddCors();
+            services.AddCors();
             
            // var connectionString = Configuration.GetSection("SqlConnecting").Get<SqlConnectingSettings>().ConnectionString; 
          

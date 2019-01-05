@@ -53,8 +53,7 @@ namespace Live.Core
             this.Count=0;
             this.YouTubeId = "oMktsOtN9uc";
             this.set_location();
-            this.Size = "20px";
-            
+            this.Size = "20px"; 
         }
 
         public void setTotalCount(List<string> stations)

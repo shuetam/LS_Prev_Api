@@ -14,10 +14,12 @@ namespace Live.Controllers
     {
 
         private readonly  IRadioSongRepository _radioRepository;
+        private readonly  ISongsRepository _songRepository;
         
-        public RadioController (IRadioSongRepository radioRepository)
+        public RadioController (IRadioSongRepository radioRepository, ISongsRepository songRepository)
         {
             this._radioRepository = radioRepository;
+            this._songRepository = songRepository;
             
         }
 
@@ -25,14 +27,20 @@ namespace Live.Controllers
         [HttpPost("update")]
         public async Task Post()
         {
-           await  _radioRepository.UpdateAsync();
+           await  _songRepository.UpdateAsync();
         }
 
-         [HttpPut("setidfor={from}/{to}")]
+       /*  [HttpPost("updatearchive")]
+        public async Task UpdateArchve()
+        {
+           await  _songRepository.UpdateArchiveAsync();
+        } */
+
+       /*   [HttpPut("setidfor={from}/{to}")]
         public async Task Post(int from, int to)
         {
            await  _radioRepository.SetYouTubeIdAsync(from, to);
-        }
+        } */
 
 
         [HttpGet("allradiosongs")]
@@ -43,23 +51,30 @@ namespace Live.Controllers
             return Json(songs);
         }
 
-        [HttpGet("allradiosongs/{stations}")]
-        public async Task <IActionResult> GetSongsByStations(string stations)
-        {
-            var radio_list= stations.Split('_').ToList();
-            var songs = await _radioRepository.GetByRadioAsync(radio_list);
-            return Json(songs);
-        }
+       
+
+
+
+
+      //  [HttpGet("allradiosongs/{stations}")]
+      //  public async Task <IActionResult> GetSongsByStations(string stations)
+      //  {
+           // var radio_list= stations.Split('_').ToList();
+           // var songs = await _songRepository.GetByRadioAsync(radio_list);
+          //  return Json(songs);
+      //  }
         
 
 
-        [HttpGet("try")]
+        /* [HttpGet("try")]
         
         public async Task <IActionResult> GetTrySongs()
         {
-            var songs = await _radioRepository.GetTryAsync();
+            var songs = await _songRepository.GetTryAsync();
             return Json(songs);
-        }
+        } */
+
+ 
 
     }
 

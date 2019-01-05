@@ -257,11 +257,8 @@ public async Task UpdateAsync()
             var hour2 = date24.Hour;
             var station = v.ToString();
             string addres = "https://www.odsluchane.eu/szukaj.php?r="+station+"&date="+date+"&time_from="+hour1+"&time_to="+hour2;
-            addresses.Add(addres, v);
-
-            
-          } 
-
+            addresses.Add(addres, v); 
+          }
     }
     return addresses;
        

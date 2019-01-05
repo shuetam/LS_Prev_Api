@@ -15,40 +15,41 @@ namespace Live.Core
 
         public List<string> addresses {get; private set;}
 
-        public UrlAddres() 
+        public UrlAddres(DateTime maxDate) 
         { 
-            this.SetAddresses();
+            this.SetAddresses(maxDate);
         }
 
-        private  void SetAddresses()
+        private  void SetAddresses(DateTime maxDate)
         {
-            var dateNow = DateTime.Now;
-
-           var date24 = dateNow.AddHours(-24);
-
-           if(int.Parse(date24.Hour.ToString())%2!=0)
-           {
-               date24 = date24.AddHours(1);
-           }
             var stations = new List<int>(){1,2,3,4,5,6,8,9,30,40};
             
+            var dateNow = DateTime.Now;
 
-       //     https://www.odsluchane.eu/szukaj.php?r=2&date=07-11-2018&time_from=14&time_to=16
+            
+  /*   var hours = (DateTime.Now - myDate).TotalHours;
+    Console.WriteLine(hours); */
 
-    foreach(var v in stations)
-    {
-        for (int j = 0;j<12;j++)
-          {
-            var date = date24.ToString("dd-MM-yyyy");
-            var hour1 = date24.Hour;
-            date24 = date24.AddHours(2);
-            var hour2 = date24.Hour;
-            var station = v.ToString();
-            string addres = "https://www.odsluchane.eu/szukaj.php?r="+station+"&date="+date+"&time_from="+hour1+"&time_to="+hour2;
-            this.addresses.Add(addres);
-          } 
-    }
-       
+
+              for (int j = 0;j<24;j++)
+                {
+                    //var date = date24.ToString("dd-MM-yyyy");
+                    var hourTo = dateNow.AddHours(-j).Hour;
+                    var dateBase = dateNow.AddHours(-j-1);
+                    var date = dateNow.AddHours(-j-1).ToString("dd-MM-yyyy");
+                    var hourFrom = dateNow.AddHours(-j-1).Hour;
+                foreach(var s in stations)
+                {
+                    string addres = "https://www.odsluchane.eu/szukaj.php?r="+s+"&date="+date+"&time_from="+hourFrom+"&time_to="+hourTo;
+                    Console.WriteLine(dateBase);
+                    Console.WriteLine(addres);
+                }
+
+                }
+                
+            
+
+
         }
     }
 }
