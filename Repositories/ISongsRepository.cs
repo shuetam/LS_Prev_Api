@@ -10,32 +10,19 @@ namespace Live.Repositories
     public interface ISongsRepository
     {   
         
-    
-          Task<List<Song>> GetAllActuall();
-         Task<ArchiveSong> GetByYouTubeFromArchive(string id);
-  
-
-          Task<ArchiveSong> GetByNameFromArchive(string name);
-
-
-
-   
-
-         Task<DateTime> GetLastDate();
-   
-     Task UpdateAsync();
-  
-
-     Task CorrectNameOrUpdateArchive(Song song);
-
-
-
-
-     Task UpdateArchiveAsync(Song actualSong);
-     Task<List<SongDto>> GetAllFromArchive();
-   
-
-
+    Task<List<Song>> GetAllActuall();
+    Task<List<FrontSong>> GetActualByRadioAsync(List<string> stations);
+    Task<ArchiveSong> GetByYouTubeFromArchive(string id);
+    Task<ArchiveSong> GetByNameFromArchive(string name);
+    Task<DateTime> GetLastDate();
+    Task UpdateAsync();
+    Task AddToArchiveAsync(Song song);
+    Task UpdateArchiveAsync(Song actualSong);
+    Task<List<SongDto>> GetAllFromArchive();
+    Task<List<SongDto>> GetFromArchiveByIndex(int i, int j);
+    Task DeleteByYouTubeId(string id);
+    Task ChangeYouTubeId(string Id, string toId);
+    Task ChangeName(string Id, string name);
 
     }
 

@@ -13,7 +13,7 @@ namespace Live.Core
     public class YouTube
     {
         public int ID {get;set;} 
-        public string VideoID {get; protected set;}
+        public string VideoID {get; set;}
         public string top_ {get; protected set;}
         public string left_ {get; protected set;}
 
@@ -25,8 +25,8 @@ namespace Live.Core
 
         public YouTube(string songName)
         {
-            this.SetID(songName);
             this.set_location();
+            this.SetID(songName);
         }
 
          public YouTube(RadioSong radio_song)
@@ -73,6 +73,10 @@ namespace Live.Core
         string p = @"\n";
         var r = new Regex(p);
         string q = r.Replace(name,"+");
+        if( Regex.IsMatch(q , @"&"))
+        {
+            q = Regex.Replace(q , @"&", "%26");
+        }
         string query = "https://www.youtube.com/results?search_query=" + q;
             WebRequest request = WebRequest.Create(query); 
             request.Credentials = CredentialCache.DefaultCredentials;
@@ -84,10 +88,20 @@ namespace Live.Core
             response.Close();
         string pattern = "watch[?]{1}v[=]{1}([^\"]+)[\"]{1}";
         var reg = new Regex(pattern);
-        string ID = reg.Matches(htmlCode).Select(s => s.Groups[1].Value).ToArray()[0];
+        string ID = ID = "!!ID!!"+this.top_+this.left_;
+        if(reg.IsMatch(htmlCode))
+        {
+        ID = reg.Matches(htmlCode).Select(s => s.Groups[1].Value).ToArray()[0];
+        }
+        if(ID.Length > 30)
+        {
+            ID = "!!ID!!"+this.top_+this.left_;
+        }
         Random rnd = new Random();
-        int sek = rnd.Next(1000, 5000);
-        Console.WriteLine(ID + "- From HTTP");
+        int sek = rnd.Next(5000, 20000);
+        Console.WriteLine("----------------F R O M   H T T P-----------------------");
+        Console.WriteLine(name);
+        Console.WriteLine(ID);
         System.Threading.Thread.Sleep(sek);
         this.VideoID = ID;
         }

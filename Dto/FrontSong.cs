@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.IO;
 namespace Live.Core
 {
-    public class SongDto
+    public class FrontSong
     {
     public string title {get; set;}
     public string  videoId {get; set;}
@@ -16,9 +16,13 @@ namespace Live.Core
     public string left {get; set;}
     public string  count {get; set;}
 
-    public SongDto()
+    public FrontSong(Song song, int count)
     {
-      
+        this.title = song.Name;
+        this.videoId = song.YouTube.VideoID;
+        this.top = song.YouTube.top_;
+        this.left = song.YouTube.left_;
+        this.count = count.ToString();
     }
 
     }

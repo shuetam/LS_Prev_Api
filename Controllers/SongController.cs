@@ -20,6 +20,11 @@ namespace Live.Controllers
             this._songRepository = songRepository;
         }
 
+        [HttpPost("update")]
+        public async Task Post()
+        {
+           await  _songRepository.UpdateAsync();
+        }
 
         [HttpGet("allarchive")]
         public async Task <IActionResult> GetAllSongs()
@@ -27,6 +32,49 @@ namespace Live.Controllers
             var songs = await _songRepository.GetAllFromArchive();
             return Json(songs);
         }
-    }
 
+        [HttpGet("archive/{i}/{j}")]
+        public async Task <IActionResult> GetArchiveSongs(int i, int j)
+        {
+            var songs = await _songRepository.GetFromArchiveByIndex(i, j);
+            return Json(songs);
+        }
+
+        [HttpDelete("delete/{id}")]
+        public async Task <IActionResult> DeleteSong(string id)
+        {
+             await _songRepository.DeleteByYouTubeId(id);
+             return NoContent();
+        }
+
+        [HttpPut("change/{Id}/{toId}")]
+        public async Task <IActionResult> ChangeYouTubeId(string Id, string toId)
+        {
+             await _songRepository.ChangeYouTubeId(Id, toId);
+             return NoContent();
+        }
+
+        [HttpPost("changename/{Id}")]
+        public async Task <IActionResult> ChangeName(string Id, [FromBody] NameSetter Name)
+        {
+             await _songRepository.ChangeName(Id, Name.name);
+             return NoContent();
+        }
+
+        [HttpGet("allradiosongs/{stations}")]
+        public async Task <IActionResult> GetAllActualSongs(string stations)
+        {
+            var radio_list= stations.Split('_').ToList();
+            var songs = await _songRepository.GetActualByRadioAsync(radio_list);
+            return Json(songs);
+        }
+
+        [HttpPost("allradiosongs/{stations}")]
+        public async Task <IActionResult> ChangeName(string stations)
+        {
+            var radio_list= stations.Split('_').ToList();
+            var songs = await _songRepository.GetActualByRadioAsync(radio_list);
+            return Json(songs);
+        }
+    }
 }

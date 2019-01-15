@@ -17,11 +17,7 @@ namespace Live.Core
     public Entity()
         {
             this.ID = new Guid();
-
-
         }
-
-
 
     }
 

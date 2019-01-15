@@ -15,9 +15,6 @@ namespace Live.Repositories
         Task SetYouTubeIdAsync(int from, int to);
 
         Task <List<Object>> GetTryAsync();
-
-
-
     }
 
 }

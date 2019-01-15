@@ -128,13 +128,7 @@ namespace Live.Repositories
             System.Threading.Thread.Sleep(3000);
 
             }
-        }
-
-
-
-
-
-        
+        }      
 public async Task UpdateAsync()
 {
             var addresses = GetAddresses();

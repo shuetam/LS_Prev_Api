@@ -48,6 +48,16 @@ namespace Live.Core
                 this.Name = name;
             }
 
+        public void ChangeYouTubeId(string id)
+        {
+            this.YouTube.VideoID = id;
+        }
+
+        public void ChangeName(string name)
+        {
+            this.Name = name;
+        }
+
 
     }
 }

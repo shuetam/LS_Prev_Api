@@ -29,21 +29,21 @@ namespace Live
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            
-            var connectionString = Configuration.GetConnectionString("LiveDatabase");
+
+            var connectionString = Configuration.GetConnectionString("LiveSearchDatabase");
             var sql_connection = new SqlConnectingSettings(connectionString);
-            
-            
+
+
             services.AddMvc().AddJsonOptions(j => j.SerializerSettings.Formatting = Newtonsoft.Json.Formatting.Indented);
             services.AddScoped<IRadioSongRepository, RadioSongRepository>();
             services.AddScoped<ISongsRepository, SongsRepository>();
             services.AddSingleton(AutoMapperConfig.Initialize());
             services.AddSingleton(sql_connection);
             services.AddCors();
-            
-           // var connectionString = Configuration.GetSection("SqlConnecting").Get<SqlConnectingSettings>().ConnectionString; 
-         
-            services.AddDbContext<LiveContext>(options => options.UseSqlServer(connectionString) );
+
+            // var connectionString = Configuration.GetSection("SqlConnecting").Get<SqlConnectingSettings>().ConnectionString; 
+
+            services.AddDbContext<LiveContext>(options => options.UseSqlServer(connectionString));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -61,7 +61,7 @@ namespace Live
 
 
 
- 
+
 
 
 

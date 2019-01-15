@@ -20,38 +20,111 @@ namespace Live.Repositories
            public SongsRepository(LiveContext liveContext, IMapper autoMapper )
         {
             this._liveContext = liveContext;
-             this._autoMapper = autoMapper;
+            this._autoMapper = autoMapper;
         }
 
-/*          public async Task<Song> GetByNameFromActual(string name)
+        public async Task<List<SongDto>> GetFromArchiveByIndex(int i, int j)
         {
-          var actualSongs = await _liveContext.ActualSongs.ToListAsync();
-          var song = actualSongs.SingleOrDefault(s => s.Name == name);
-          return song;
-        }
-        public async Task<Song> GetByYouTubeFromActual(string id)
-        {
-          var actualSongs = await _liveContext.ActualSongs.ToListAsync();
-          var song = actualSongs.SingleOrDefault(s => s.YouTube.VideoID == id);
-          return song;
+            var archiveSongs = await _liveContext.ArchiveSongs.Include(x=>x.YouTube).ToListAsync();
+            int archCount = archiveSongs.Count;
+            if(j>archCount)
+            {
+                j=archCount-1;
+            }
+
+            var songs = archiveSongs.Where(s => archiveSongs.IndexOf(s)>=i && archiveSongs.IndexOf(s)<=j).ToList();
+            return songs.Select(s =>  _autoMapper.Map<SongDto>(s)).ToList();
         }
 
-        
-         public async Task<Song> GetByNameFromArchive(string name)
+      public async Task DeleteByYouTubeId(string id)
         {
-          var actualSongs = await _liveContext.ArchiveSongs.ToListAsync();
-          var song = actualSongs.SingleOrDefault(s => s.Name == name);
-          return song;
+            var archiveSong = await GetByYouTubeFromArchive(id);
+            var actuallSong =  await GetByYouTubeFromActuall(id);
+
+            if(archiveSong != null)
+            {
+                _liveContext.ArchiveSongs.Remove(archiveSong);
+            }
+
+            if(actuallSong != null)
+            {
+                _liveContext.Songs.Remove(actuallSong);
+            }
+           await _liveContext.SaveChangesAsync();
         }
-        */
+
+/////////////CHANGE!! - FOR ALL IN ARCHIVE AND IN CURRENT SONGS!!------
+       public async Task ChangeYouTubeId(string Id, string toId)
+       {
+            var archiveSong = await GetByYouTubeFromArchive(Id);
+            var actuallSong =  await GetByYouTubeFromActuall(Id);
+
+            if(actuallSong != null)
+            {
+                actuallSong.ChangeYouTubeId(toId);
+                _liveContext.Update(actuallSong);
+            }
+
+            archiveSong.ChangeYouTubeId(toId);
+
+            _liveContext.Update(archiveSong);
+
+           await _liveContext.SaveChangesAsync();
+       }
+
+
+        public async Task ChangeName(string Id, string name)
+       {
+            var archiveSong = await GetByYouTubeFromArchive(Id);
+            var actuallSong =  await GetByYouTubeFromActuall(Id);
+
+            if(actuallSong != null)
+            {
+                actuallSong.ChangeName(name);
+                _liveContext.Update(actuallSong);
+            }
+
+            archiveSong.ChangeName(name);
+
+            _liveContext.Update(archiveSong);
+
+           await _liveContext.SaveChangesAsync();
+       }
+
+
+
 
         public async Task<List<SongDto>> GetAllFromArchive()
         {
             var archiveSongs = await _liveContext.ArchiveSongs.Include(x=>x.YouTube)
-            .Where(x => x.YouTube.top_.Length<9 && x.YouTube.left_.Length<9)
             .ToListAsync();
-           return   archiveSongs.Select(s =>  _autoMapper.Map<SongDto>(s)).ToList();
+           return archiveSongs.Select(s =>  _autoMapper.Map<SongDto>(s)).ToList();
         }
+
+
+        public async Task<List<FrontSong>> GetActualByRadioAsync(List<string> stations)
+        {
+          var all_songs =  await _liveContext.Songs.Include(s => s.YouTube).ToListAsync();
+          var songs = new List<Song>();
+          var songsDto = new List<FrontSong>();
+
+          foreach(string radio in stations)
+          {
+              songs.AddRange(all_songs.Where(s => s.Station == radio).ToList());
+          }
+        
+          while(songs.Count != 0)
+          {
+              var song = songs[0];
+              var songCount = songs.Where(s => s.YouTube.VideoID == song.YouTube.VideoID).ToList().Count;
+              songs.RemoveAll(s => s.YouTube.VideoID == song.YouTube.VideoID);
+              songsDto.Add(new FrontSong(song, songCount));
+          }
+
+          return songsDto;
+
+        }
+
 
          public async Task<List<Song>> GetAllActuall()
         {
@@ -62,6 +135,13 @@ namespace Live.Repositories
         public async Task<ArchiveSong> GetByYouTubeFromArchive(string id)
         {
           var archiveSongs = await _liveContext.ArchiveSongs.Include(x=>x.YouTube).ToListAsync();
+          var song = archiveSongs.SingleOrDefault(s => s.YouTube.VideoID == id);
+          return song;
+        }
+
+        public async Task<Song> GetByYouTubeFromActuall(string id)
+        {
+          var archiveSongs = await _liveContext.Songs.Include(x=>x.YouTube).ToListAsync();
           var song = archiveSongs.SingleOrDefault(s => s.YouTube.VideoID == id);
           return song;
         } 
@@ -77,31 +157,7 @@ namespace Live.Repositories
             var songArch = archiveSongs.SingleOrDefault(s => s.Name == name);
             
             return songArch;
-
-            
-
         }
-
-
-
-
-
-
-
-
-    /*1 - zet
-    2 - rmf
-    3 - eska
-    4 - rmf maxx
-    5 - antyradio
-    6 - rmf classic
-    40 - chillizet
-    9 - zlote przeboje
-    30 - vox fm
-    8 - plus */
-
-
-
 
         public async Task<DateTime> GetLastDate ()
         {
@@ -114,31 +170,30 @@ namespace Live.Repositories
 
     public async Task UpdateAsync()
     {
-          //  var stations = new Dictionary<int, string>(){{1,"zet"},{2,"rmf"},{3,"eska"},{4, "rmfmaxx"},
-          //  {5,"antyradio"},{6, "rmfclassic"},{8, "plus"},{9, "zloteprzeboje"},{30, "vox"},{40, "chillizet"}};
+           var stations = new Dictionary<int, string>(){{1,"zet"},{2,"rmf"},{3,"eska"},{4, "rmfmaxx"},
+           {5,"antyradio"},{6, "rmfclassic"},{8, "plus"},{9, "zloteprzeboje"},{30, "vox"},{40, "chillizet"}};
             
-             var stations = new Dictionary<int, string>(){{2,"rmf"}, {30, "vox"}};
+      //  var stations = new Dictionary<int, string>(){{40, "chillizet"}, {30, "vox"},{9, "zloteprzeboje"}};
             
             
           // var dateLast = await GetLastDate();
 
-          Console.WriteLine("last date - " + await GetLastDate());
+         // Console.WriteLine("last date - " + await GetLastDate());
 
-              DateTime dateLast = DateTime.ParseExact(
-         "2019-01-05 16:06", "yyyy-MM-dd HH:mm", 
+    DateTime dateLast = DateTime.ParseExact(
+         "2019-01-15 19:06", "yyyy-MM-dd HH:mm", 
         System.Globalization.CultureInfo.InvariantCulture);
 
-Console.WriteLine(dateLast);
+                Console.WriteLine(dateLast);
 
                 var dateNow = DateTime.Now;
                 int hourNow = dateNow.Hour;
-Console.WriteLine(dateNow );
+                Console.WriteLine(dateNow );
 
                 var hours = (dateNow - dateLast).TotalHours;
 
                 int i = 0;
                 int h = 50;
-Console.WriteLine(hours);
                 if (hours>=24)
                 {
                     i = 24;
@@ -157,18 +212,18 @@ Console.WriteLine(hours);
                     {
                     dateLast = dateLast.AddHours(1);
                     h =  dateLast.Hour;
-                    Console.WriteLine(h);
+
                     i++;
             
                     } 
                 }
-                Console.WriteLine(i);
+
 
             var listOfInitialSongs = new List<Song>();
 
             for (int j = 0;j<i;j++)
                 {
-                    //var date = date24.ToString("dd-MM-yyyy");
+
                     var hourTo = dateNow.AddHours(-j).Hour;
                     var dateBase = dateNow.AddHours(-j);
                     var date = dateNow.AddHours(-j-1).ToString("dd-MM-yyyy");
@@ -176,28 +231,31 @@ Console.WriteLine(hours);
                 foreach(var s in stations.Keys)
                 {
                     string addres = "https://www.odsluchane.eu/szukaj.php?r="+s+"&date="+date+"&time_from="+hourFrom+"&time_to="+hourTo;
-                  //  Console.WriteLine(dateBase);
                     Console.WriteLine(addres);
                   var names = get_names_from_url(addres);
-
+                
+                if(names.Count>0)
+                {
                   foreach(var name in names)
                   {
                       listOfInitialSongs.Add(new Song(name, stations[s], dateBase ));
                   }
                 }
+                }
 
                 }
 
-
+            if(listOfInitialSongs.Count>0)
+            {
                 foreach(var song in listOfInitialSongs)
                 {
-                    Console.WriteLine(song.Name);
+                    
                     var archiveSong = await GetByNameFromArchive(song.Name);
 
                 if(archiveSong is null)
                     {
                     song.SetYoutube();
-                    await CorrectNameOrUpdateArchive(song);
+                    await AddToArchiveAsync(song);
                     }
                     else
                     {
@@ -207,40 +265,30 @@ Console.WriteLine(hours);
                 await _liveContext.Songs.AddAsync(song);
                 await _liveContext.SaveChangesAsync();
                 }
+            }
+        Console.WriteLine("-----------------------FINISH UPDATE----------------------");
            
-
-
-
-
         List<string> get_names_from_url(string url)
         {
         WebClient client = new WebClient();
         string htmlCode = client.DownloadString(url);
-
+        List<string> names = new List<string>();
         string pattern = "class[=]{1}[\"]{1}title-link[\"]{1}[>]{1}([^\"]+)[<]{1}[/]{1}a[>]{1}";
         var reg1 = new Regex(pattern);
-        List<string> names = reg1.Matches(htmlCode).Select(s => s.Groups[1].Value.Trim()).ToList();
+        if(reg1.IsMatch(htmlCode))
+        {
+        names = reg1.Matches(htmlCode).Select(s => s.Groups[1].Value.Trim()).ToList();
+        }
         return names;
         }
-
     }
 
-    public async Task CorrectNameOrUpdateArchive(Song song)
+    public async Task AddToArchiveAsync(Song song)
     {
-
-        var archiveSong = await GetByYouTubeFromArchive(song.YouTube.VideoID);
-
-        if(archiveSong is null)
-        {
             var toArchiveSong = new ArchiveSong(song);
-            Console.WriteLine($"Add to archive song with name |{song.Name}| - {song.YouTube.VideoID}");
             await _liveContext.ArchiveSongs.AddAsync(toArchiveSong);
             await _liveContext.SaveChangesAsync();
-        }
-        else 
-        {
-            song.CorrectName(archiveSong);
-        }
+
     }
 
 
@@ -264,84 +312,6 @@ Console.WriteLine(hours);
             }  
            // Console.WriteLine(archiveSong.Name);
         }
-    }
-
-
-
-
-
-
-
-
-
-/*     public async Task Migrate()
-    {
-       // var old_radio_songs =  await _liveContext.RadioSongs.Where(r => r.YouTubeId != "oMktsOtN9uc").ToListAsync();
-
-         var archSongs =  await _liveContext.ArchiveSongs.Where(s => Regex.IsMatch(s.Name , @"&amp;")).ToListAsync();
-
-         foreach(var s in archSongs)
-         {
-            Console.WriteLine(s.Name);
-            
-             s.ReplaceBush(Regex.Replace(s.Name , @"&#039;", "'"));
-             _liveContext.ArchiveSongs.Update(s);
-             await _liveContext.SaveChangesAsync();
-         }  */ 
-
-       /* foreach(var old in old_radio_songs)
-        {
-           var archive = await _liveContext.ArchiveSongs.Include(x=> x.YouTube).ToListAsync();
-           var list = archive.Where(s => s.YouTube.VideoID == old.YouTubeId && s.Name != old.Name)
-           .ToList();
-           var iscontain = list.Count;
-
-           if(iscontain>0)
-           {
-               var name = list[0].Name;
-               var song = new ArchiveSong(name,old);
-               await _liveContext.ArchiveSongs.AddAsync(song);
-               await _liveContext.SaveChangesAsync();
-           }
-           else
-           {
-                var name = old.Name;
-                var song = new ArchiveSong(name,old);
-                await _liveContext.ArchiveSongs.AddAsync(song);
-                await _liveContext.SaveChangesAsync();
-           }
-            
-        }  */
     } 
-
-   /*  public async Task Migrate()
-    {
-        var archive = await _liveContext.ArchiveSongs.ToListAsync();
-
-        foreach(var s in archive)
-        {
-            var theSame = archive.Where(x => x.Name == s.Name).ToList();
-            Console.WriteLine(theSame.Count);
-            if (theSame.Count>1)
-            {
-                Console.WriteLine($"Usuwam {s.Name}");
-                _liveContext.ArchiveSongs.Remove(s);
-               await _liveContext.SaveChangesAsync();
-            }
-        }
-
-    } */
-
-
-
-
-
-
-       
-    
-
+} 
 }
-
-
-
-

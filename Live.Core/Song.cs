@@ -56,19 +56,30 @@ namespace Live.Core
             public void  SetYoutube(ArchiveSong songFromDatabse)
             {
                 this.YouTube = songFromDatabse.YouTube;
-                Console.WriteLine(songFromDatabse.YouTube.VideoID + " - From Archive");
+                Console.WriteLine("----------------F R O M   ARCHIVE-----------------------");
+                Console.WriteLine(songFromDatabse.Name);
+                Console.WriteLine(songFromDatabse.YouTube.VideoID);
             }
 
             public void  CorrectName(ArchiveSong songFromDatabse)
             {
-                
-                Console.WriteLine($"Correct name from  |{this.Name}|  to  |{songFromDatabse.Name}|");
+                Console.WriteLine("---------------------CORRECT  NAME------------------------");
+                Console.WriteLine($"FROM  ///{this.Name}///  TO  ///{songFromDatabse.Name}///");
                 this.Name = songFromDatabse.Name;
             }
 
+        public void ChangeYouTubeId(string id)
+        {
+            this.YouTube.VideoID = id;
+        }
+
+        public void ChangeName(string name)
+        {
+            this.Name = name;
+        }
+
         public void  ReplaceBush(string name)
             {
-                
                 this.Name = name;
             }
 
