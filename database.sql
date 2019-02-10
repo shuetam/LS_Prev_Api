@@ -26,6 +26,7 @@ CREATE TABLE Songs
     YouTubeID  INT  NULL,
 )
 
+SELECT * FROM Songs
 
 
 CREATE TABLE ArchiveSongs

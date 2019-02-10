@@ -26,6 +26,8 @@ namespace Live.Core
             this.YouTube = archive_song.YouTube;
         } */
 
+        
+
        protected Song()
         {}
         public Song(string name, string station, DateTime date)
@@ -35,6 +37,11 @@ namespace Live.Core
             if(Regex.IsMatch(name , @"&#039;"))
             {
             name = Regex.Replace(name , @"&#039;", "'");
+            }
+
+            if(Regex.IsMatch(name , @"&apos;"))
+            {
+            name = Regex.Replace(name , @"&apos;", "'");
             }
 
             if(Regex.IsMatch(name , @"&amp;"))
@@ -51,6 +58,7 @@ namespace Live.Core
             public void  SetYoutube()
             {
                 this.YouTube = new YouTube(this.Name);
+              
             }
 
             public void  SetYoutube(ArchiveSong songFromDatabse)

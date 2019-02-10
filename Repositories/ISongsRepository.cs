@@ -23,6 +23,7 @@ namespace Live.Repositories
     Task DeleteByYouTubeId(string id);
     Task ChangeYouTubeId(string Id, string toId);
     Task ChangeName(string Id, string name);
+    Task<List<FrontSong>> GetActualRandomSongs();
 
     }
 

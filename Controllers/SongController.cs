@@ -69,11 +69,11 @@ namespace Live.Controllers
             return Json(songs);
         }
 
-        [HttpPost("allradiosongs/{stations}")]
-        public async Task <IActionResult> ChangeName(string stations)
+        [HttpGet("random")]
+        public async Task <IActionResult> GetAllRandomSongs()
         {
-            var radio_list= stations.Split('_').ToList();
-            var songs = await _songRepository.GetActualByRadioAsync(radio_list);
+        
+            var songs = await _songRepository.GetActualRandomSongs();
             return Json(songs);
         }
     }

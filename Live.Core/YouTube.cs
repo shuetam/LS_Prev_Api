@@ -6,7 +6,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using System.IO;
-
+using Microsoft.Extensions.Configuration;
 
 namespace Live.Core
 {
@@ -20,12 +20,15 @@ namespace Live.Core
         private double top;
         private double left;
 
+        public IConfiguration Configuration { get; }
+ 
        protected YouTube()
         {}
 
         public YouTube(string songName)
         {
             this.set_location();
+           
             this.SetID(songName);
         }
 
@@ -70,6 +73,9 @@ namespace Live.Core
 
          private void SetID(string name)
         {
+            var googleKey = Configuration.GetConnectionString("GoogleKey");
+            Console.WriteLine(googleKey);
+
         string p = @"\n";
         var r = new Regex(p);
         string q = r.Replace(name,"+");
@@ -98,7 +104,7 @@ namespace Live.Core
             ID = "!!ID!!"+this.top_+this.left_;
         }
         Random rnd = new Random();
-        int sek = rnd.Next(5000, 20000);
+        int sek = rnd.Next(3000, 15000);
         Console.WriteLine("----------------F R O M   H T T P-----------------------");
         Console.WriteLine(name);
         Console.WriteLine(ID);

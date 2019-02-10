@@ -103,14 +103,56 @@ namespace Live.Repositories
 
 
         public async Task<List<FrontSong>> GetActualByRadioAsync(List<string> stations)
-        {
-          var all_songs =  await _liveContext.Songs.Include(s => s.YouTube).ToListAsync();
-          var songs = new List<Song>();
-          var songsDto = new List<FrontSong>();
+        {  
+            var date24 = DateTime.Now.AddHours(-24);
+            var all_songs =  await _liveContext.Songs.Include(s => s.YouTube).Where(s => s.PlayAt>=date24).ToListAsync();
+            var songs = new List<Song>();
+            var songsDto = new List<FrontSong>();
 
           foreach(string radio in stations)
           {
               songs.AddRange(all_songs.Where(s => s.Station == radio).ToList());
+          }
+        
+          while(songs.Count != 0)
+          {
+              var song = songs[0];
+              var songCount = songs.Where(s => s.YouTube.VideoID == song.YouTube.VideoID).ToList().Count;
+              songs.RemoveAll(s => s.YouTube.VideoID == song.YouTube.VideoID);
+              songsDto.Add(new FrontSong(song, songCount));
+          }
+
+          return songsDto;
+
+        }
+
+
+        public async Task<List<FrontSong>> GetActualRandomSongs()
+        {  
+            var date24 = DateTime.Now.AddHours(-24);
+            var all_songs =  await _liveContext.Songs.Include(s => s.YouTube).Where(s => s.PlayAt>=date24).ToListAsync();
+            var songs = new List<Song>();
+            var songsDto = new List<FrontSong>();
+            Random random = new Random();
+            var stations = new Dictionary<int, string>(){{1,"zet"},{2,"rmf"},{3,"eska"},{4, "rmfmaxx"},
+           {5,"antyradio"},{6, "rmfclassic"},{8, "plus"},{9, "zloteprzeboje"},{30, "vox"},{40, "chillizet"}};
+
+    
+          foreach(var radio in stations)
+          {
+            for(int i = 0;i<10;i++)
+            {
+            
+            var randomSong = all_songs.Where(s => s.Station == radio.Value).ToList()[random.Next(all_songs.Where(s => s.Station == radio.Value).ToList().Count)];
+            all_songs.RemoveAll(s=>s.YouTube.VideoID == randomSong.YouTube.VideoID);
+            songs.Add(randomSong);
+
+            }
+          }
+        
+          foreach(var s in songs)
+          {
+              Console.WriteLine($"{s.Name}  --- {s.Station}");
           }
         
           while(songs.Count != 0)
@@ -181,7 +223,7 @@ namespace Live.Repositories
          // Console.WriteLine("last date - " + await GetLastDate());
 
     DateTime dateLast = DateTime.ParseExact(
-         "2019-01-15 19:06", "yyyy-MM-dd HH:mm", 
+         "2019-02-09 20:06", "yyyy-MM-dd HH:mm", 
         System.Globalization.CultureInfo.InvariantCulture);
 
                 Console.WriteLine(dateLast);
@@ -263,23 +305,23 @@ namespace Live.Repositories
                     }
 
                 await _liveContext.Songs.AddAsync(song);
-                await _liveContext.SaveChangesAsync();
                 }
+                await _liveContext.SaveChangesAsync();
             }
         Console.WriteLine("-----------------------FINISH UPDATE----------------------");
            
         List<string> get_names_from_url(string url)
         {
-        WebClient client = new WebClient();
-        string htmlCode = client.DownloadString(url);
-        List<string> names = new List<string>();
-        string pattern = "class[=]{1}[\"]{1}title-link[\"]{1}[>]{1}([^\"]+)[<]{1}[/]{1}a[>]{1}";
-        var reg1 = new Regex(pattern);
+            WebClient client = new WebClient();
+            string htmlCode = client.DownloadString(url);
+            List<string> names = new List<string>();
+            string pattern = "class[=]{1}[\"]{1}title-link[\"]{1}[>]{1}([^\"]+)[<]{1}[/]{1}a[>]{1}";
+            var reg1 = new Regex(pattern);
         if(reg1.IsMatch(htmlCode))
         {
-        names = reg1.Matches(htmlCode).Select(s => s.Groups[1].Value.Trim()).ToList();
+            names = reg1.Matches(htmlCode).Select(s => s.Groups[1].Value.Trim()).ToList();
         }
-        return names;
+            return names;
         }
     }
 
