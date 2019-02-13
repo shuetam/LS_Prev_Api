@@ -32,8 +32,7 @@ namespace Live
 
             var connectionString = Configuration.GetConnectionString("LiveSearchDatabase");
             var sql_connection = new SqlConnectingSettings(connectionString);
-            var googleKey = Configuration.GetConnectionString("GoogleKey");
-            var licension = new Licension(googleKey);
+
 
 
             services.AddMvc().AddJsonOptions(j => j.SerializerSettings.Formatting = Newtonsoft.Json.Formatting.Indented);
@@ -41,7 +40,6 @@ namespace Live
             services.AddScoped<ISongsRepository, SongsRepository>();
             services.AddSingleton(AutoMapperConfig.Initialize());
             services.AddSingleton(sql_connection);
-            services.AddSingleton(licension);
             services.AddCors();
 
             // var connectionString = Configuration.GetSection("SqlConnecting").Get<SqlConnectingSettings>().ConnectionString; 

@@ -223,7 +223,7 @@ namespace Live.Repositories
          // Console.WriteLine("last date - " + await GetLastDate());
 
     DateTime dateLast = DateTime.ParseExact(
-         "2019-02-09 20:06", "yyyy-MM-dd HH:mm", 
+         "2019-02-12 21:06", "yyyy-MM-dd HH:mm", 
         System.Globalization.CultureInfo.InvariantCulture);
 
                 Console.WriteLine(dateLast);

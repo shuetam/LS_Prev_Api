@@ -28,7 +28,6 @@ namespace Live.Core
         public YouTube(string songName)
         {
             this.set_location();
-           
             this.SetID(songName);
         }
 
@@ -69,13 +68,51 @@ namespace Live.Core
 
         }
 
-
-
-         private void SetID(string name)
+        private void SetID(string name)
         {
-            var googleKey = Configuration.GetConnectionString("GoogleKey");
-            Console.WriteLine(googleKey);
+            string googleKey = new GoogleKey().googleKey;
 
+            string query = $"https://www.googleapis.com/youtube/v3/search/?part=snippet%20&maxResults=1&q={name}&key={googleKey}";
+            string json = "Error";
+            try
+            {
+            WebRequest request = WebRequest.Create(query); 
+            request.Credentials = CredentialCache.DefaultCredentials;
+            WebResponse response = request.GetResponse(); 
+            Stream dataStream = response.GetResponseStream();   
+            StreamReader reader = new StreamReader(dataStream);   
+            json = reader.ReadToEnd();  
+            reader.Close();
+            response.Close();
+            }
+            catch(Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
+
+            string pattern = "[\"]{1}videoId[\"]{1}[:]{1}[\\s]{1}[\"]{1}([^\"]+)[\"]{1}"; 
+           
+
+        var reg = new Regex(pattern);
+        string ID = ID = "!!ID!!";
+        if(reg.IsMatch(json))
+        {
+        ID = reg.Matches(json).Select(s => s.Groups[1].Value).ToArray()[0];
+        this.VideoID = ID;
+        Console.WriteLine("--------------F R O M   A P I-----------------");
+        Console.WriteLine(name);
+        Console.WriteLine(ID);
+        }
+       else
+        {
+           SetIDFromYouTube(name);
+        }
+
+        }
+
+
+         private void SetIDFromYouTube(string name)
+        {
         string p = @"\n";
         var r = new Regex(p);
         string q = r.Replace(name,"+");
@@ -83,15 +120,24 @@ namespace Live.Core
         {
             q = Regex.Replace(q , @"&", "%26");
         }
+
         string query = "https://www.youtube.com/results?search_query=" + q;
+        string htmlCode = "Error";
+           try 
+           {
             WebRequest request = WebRequest.Create(query); 
             request.Credentials = CredentialCache.DefaultCredentials;
             WebResponse response = request.GetResponse(); 
             Stream dataStream = response.GetResponseStream();   
             StreamReader reader = new StreamReader(dataStream);   
-            string htmlCode = reader.ReadToEnd();  
+            htmlCode = reader.ReadToEnd();  
             reader.Close();
             response.Close();
+           }
+           catch(Exception e)
+           {
+               Console.WriteLine(e.Message);
+           }
         string pattern = "watch[?]{1}v[=]{1}([^\"]+)[\"]{1}";
         var reg = new Regex(pattern);
         string ID = ID = "!!ID!!"+this.top_+this.left_;
@@ -104,7 +150,7 @@ namespace Live.Core
             ID = "!!ID!!"+this.top_+this.left_;
         }
         Random rnd = new Random();
-        int sek = rnd.Next(3000, 15000);
+        int sek = rnd.Next(500, 1500);
         Console.WriteLine("----------------F R O M   H T T P-----------------------");
         Console.WriteLine(name);
         Console.WriteLine(ID);

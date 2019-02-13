@@ -49,8 +49,12 @@ namespace Live.Core
             name = Regex.Replace(name , @"&amp;", "&");
             }
 
-            this.Name = name;
+            if(Regex.IsMatch(name , "[#]{1}[^\"]+"))
+            {
+            name = Regex.Replace(name , "[#]{1}[^\"]+", "");
+            }
 
+            this.Name = name;
 
             this.Station = station;
         }
