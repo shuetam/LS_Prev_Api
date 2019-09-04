@@ -68,11 +68,15 @@ namespace Live.Core
             public void  SetYoutube(ArchiveSong songFromDatabse)
             {
                 this.YouTube = songFromDatabse.YouTube;
-                Console.WriteLine("----------------F R O M   ARCHIVE-----------------------");
-                Console.WriteLine(songFromDatabse.Name);
-                Console.WriteLine(songFromDatabse.YouTube.VideoID);
+             //   Console.WriteLine("----------------F R O M   ARCHIVE-----------------------");
+             //   Console.WriteLine(songFromDatabse.Name);
+              //  Console.WriteLine(songFromDatabse.YouTube.VideoID);
             }
 
+            public void SetWhileYoutube()
+            {
+                  this.YouTube = new YouTube(this.Name, false);
+            }
             public void  CorrectName(ArchiveSong songFromDatabse)
             {
                 Console.WriteLine("---------------------CORRECT  NAME------------------------");

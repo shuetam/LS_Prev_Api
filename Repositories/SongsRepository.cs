@@ -64,11 +64,12 @@ namespace Live.Repositories
                 actuallSong.ChangeYouTubeId(toId);
                 _liveContext.Update(actuallSong);
             }
-
+            if(archiveSong != null)
+            {
             archiveSong.ChangeYouTubeId(toId);
 
             _liveContext.Update(archiveSong);
-
+            }
            await _liveContext.SaveChangesAsync();
        }
 
@@ -83,11 +84,12 @@ namespace Live.Repositories
                 actuallSong.ChangeName(name);
                 _liveContext.Update(actuallSong);
             }
-
+   if(archiveSong != null)
+            {
             archiveSong.ChangeName(name);
 
             _liveContext.Update(archiveSong);
-
+            }
            await _liveContext.SaveChangesAsync();
        }
 
@@ -105,7 +107,9 @@ namespace Live.Repositories
         public async Task<List<FrontSong>> GetActualByRadioAsync(List<string> stations)
         {  
             var date24 = DateTime.Now.AddHours(-24);
-            var all_songs =  await _liveContext.Songs.Include(s => s.YouTube).Where(s => s.PlayAt>=date24).ToListAsync();
+           var all_songs =  await _liveContext.Songs.Include(s => s.YouTube).Where(s => s.PlayAt>=date24).ToListAsync();
+            // var all_songs =  await _liveContext.Songs.Include(s => s.YouTube).Where(s => s.PlayAt<date24).ToListAsync();
+            
             var songs = new List<Song>();
             var songsDto = new List<FrontSong>();
 
@@ -134,10 +138,11 @@ namespace Live.Repositories
             var songs = new List<Song>();
             var songsDto = new List<FrontSong>();
             Random random = new Random();
-            var stations = new Dictionary<int, string>(){{1,"zet"},{2,"rmf"},{3,"eska"},{4, "rmfmaxx"},
+           /*  var stations = new Dictionary<int, string>(){{1,"zet"},{2,"rmf"},{3,"eska"},{4, "rmfmaxx"},
            {5,"antyradio"},{6, "rmfclassic"},{8, "plus"},{9, "zloteprzeboje"},{30, "vox"},{40, "chillizet"}};
-
-    
+ */
+        var stations = new Dictionary<int, string>(){{1,"zet"},{2,"rmf"},{3,"eska"},{4, "rmfmaxx"},{9, "zloteprzeboje"},{30, "vox"}};
+            
           foreach(var radio in stations)
           {
             for(int i = 0;i<10;i++)
@@ -177,14 +182,14 @@ namespace Live.Repositories
         public async Task<ArchiveSong> GetByYouTubeFromArchive(string id)
         {
           var archiveSongs = await _liveContext.ArchiveSongs.Include(x=>x.YouTube).ToListAsync();
-          var song = archiveSongs.SingleOrDefault(s => s.YouTube.VideoID == id);
+          var song = archiveSongs.FirstOrDefault(s => s.YouTube.VideoID == id);
           return song;
         }
 
         public async Task<Song> GetByYouTubeFromActuall(string id)
         {
           var archiveSongs = await _liveContext.Songs.Include(x=>x.YouTube).ToListAsync();
-          var song = archiveSongs.SingleOrDefault(s => s.YouTube.VideoID == id);
+          var song = archiveSongs.FirstOrDefault(s => s.YouTube.VideoID == id);
           return song;
         } 
 
@@ -212,27 +217,35 @@ namespace Live.Repositories
 
     public async Task UpdateAsync()
     {
-           var stations = new Dictionary<int, string>(){{1,"zet"},{2,"rmf"},{3,"eska"},{4, "rmfmaxx"},
-           {5,"antyradio"},{6, "rmfclassic"},{8, "plus"},{9, "zloteprzeboje"},{30, "vox"},{40, "chillizet"}};
-            
-      //  var stations = new Dictionary<int, string>(){{40, "chillizet"}, {30, "vox"},{9, "zloteprzeboje"}};
-            
-            
-          // var dateLast = await GetLastDate();
 
-         // Console.WriteLine("last date - " + await GetLastDate());
+         // var stations = new Dictionary<int, string>(){{1,"zet"},{2,"rmf"},{3,"eska"},{4, "rmfmaxx"},
+          // {5,"antyradio"},{6, "rmfclassic"},{8, "plus"},{9, "zloteprzeboje"},{30, "vox"},{40, "chillizet"}};
+            
+             var stations = new Dictionary<int, string>(){{1,"zet"},{2,"rmf"},{3,"eska"},{4, "rmfmaxx"},{9, "zloteprzeboje"},{30, "vox"}};
+            
+    //  var stations = new Dictionary<int, string>(){{40, "chillizet"}, {30, "vox"},{9, "zloteprzeboje"}};
+            
+            
+           var dateLast = await GetLastDate();
 
-    DateTime dateLast = DateTime.ParseExact(
-         "2019-02-12 21:06", "yyyy-MM-dd HH:mm", 
-        System.Globalization.CultureInfo.InvariantCulture);
+      //    Console.WriteLine("last date - " + await GetLastDate());
+
+  //   DateTime dateLast = DateTime.ParseExact(
+    //     "2019-03-18 21:06", "yyyy-MM-dd HH:mm", 
+    //    System.Globalization.CultureInfo.InvariantCulture); 
 
                 Console.WriteLine(dateLast);
+
+
 
                 var dateNow = DateTime.Now;
                 int hourNow = dateNow.Hour;
                 Console.WriteLine(dateNow );
 
                 var hours = (dateNow - dateLast).TotalHours;
+
+        _liveContext.Songs.RemoveRange(_liveContext.Songs.Where(s => s.PlayAt<dateNow.AddHours(-25)));
+
 
                 int i = 0;
                 int h = 50;
@@ -262,6 +275,7 @@ namespace Live.Repositories
 
 
             var listOfInitialSongs = new List<Song>();
+            var songsCount = 0;
 
             for (int j = 0;j<i;j++)
                 {
@@ -289,22 +303,41 @@ namespace Live.Repositories
 
             if(listOfInitialSongs.Count>0)
             {
+                var toManyReq = false;
+              songsCount = listOfInitialSongs.Count;
                 foreach(var song in listOfInitialSongs)
-                {
+                {   
+                    
+                    Console.WriteLine(songsCount);
                     
                     var archiveSong = await GetByNameFromArchive(song.Name);
 
                 if(archiveSong is null)
+                {
+                    if(toManyReq == false)
                     {
-                    song.SetYoutube();
-                    await AddToArchiveAsync(song);
+                        song.SetYoutube();
                     }
                     else
                     {
-                    song.SetYoutube(archiveSong);
+                        song.SetWhileYoutube();
                     }
 
-                await _liveContext.Songs.AddAsync(song);
+                    if (song.YouTube.VideoID == "ServerError")
+                    {
+                        toManyReq = true;
+                    }
+                        await AddToArchiveAsync(song);
+                }
+          
+                    else
+                    {
+                        song.SetYoutube(archiveSong);
+                    }
+
+                    await _liveContext.Songs.AddAsync(song);
+
+                songsCount = songsCount-1;
                 }
                 await _liveContext.SaveChangesAsync();
             }

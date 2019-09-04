@@ -6,9 +6,15 @@ using Live.Repositories;
 using Microsoft.AspNetCore.Mvc;
 using AutoMapper;
 using Live.Mapper;
+using System.Diagnostics;
+using System.Web.Http.Cors;
+using Newtonsoft.Json.Linq;
+using Live.Core;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Live.Controllers
 {
+    [EnableCors(origins: "http://localhost:3000", headers: "*", methods: "*")]
     [Route("api/[controller]")]
     public class SongController : Controller
     {
@@ -18,6 +24,23 @@ namespace Live.Controllers
         public SongController (ISongsRepository songRepository)
         {
             this._songRepository = songRepository;
+        }
+//[EnableCors(origins: "http://localhost:3000", headers: "*", methods: "*")]
+//[EnableCors("MyPolicy")]
+        [HttpPost("editsong")]
+        //[Authorize]
+        public async Task <IActionResult> EditSong([FromBody]EditSong editSong)
+        {
+            Debug.Print("EDITSONG");
+            if(editSong.newYouTubeId != editSong.youTubeId)
+            {
+                await _songRepository.ChangeYouTubeId(editSong.youTubeId, editSong.newYouTubeId);
+            }
+            if(editSong.newName != editSong.name)
+            {
+                await _songRepository.ChangeName(editSong.youTubeId, editSong.newName);
+            }
+           return Json(editSong);
         }
 
         [HttpPost("update")]

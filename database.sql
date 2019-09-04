@@ -6,14 +6,87 @@ use shuetam_livesearch
 
 ------------------------LIVESEARCH-------------------------
 
------------------------NEW DATABASE------------------------
+-----------------------NEW DATABASE-----------------------
+
+
+CREATE TABLE Users
+(
+    ID UNIQUEIDENTIFIER PRIMARY KEY,
+    UserSocialId NVARCHAR (100),
+    UserName NVARCHAR (100) NOT NULL,
+    UserEmail NVARCHAR (50) NOT NULL,
+    CreatedAt DATETIME NULL,
+    LastLogin DATETIME NULL,
+    LoginsCount INT,
+    IsActive BIT,
+    AuthType NVARCHAR (10) NOT NULL
+)
+
+
+SELECT * FROM Users
+
+DROP TABLE Users
+
+SELECT * FROM UserYoutubes
+
+delete from UserYoutubes
+WHERE LocLeft like '%20%'
+
+CREATE TABLE UserYoutubes
+(
+    ID UNIQUEIDENTIFIER PRIMARY KEY,
+    UserId UNIQUEIDENTIFIER NOT NULL,
+    FolderId UNIQUEIDENTIFIER NULL,
+    VideoId NVARCHAR (300) NOT NULL,
+    LocLeft NVARCHAR (50) NOT NULL,
+    LocTop NVARCHAR (50) NOT NULL,
+    Title NVARCHAR (300) NOT NULL,
+    CreatedAt DATETIME,
+)
+
+drop table UserYoutubes
+
+
+ALTER TABLE UserYoutubes ADD CONSTRAINT 
+FK_YoutubeUserID FOREIGN KEY (UserId) 
+REFERENCES Users(ID)
+
+
+SELECT * FROM Folders
+
+
+CREATE TABLE Folders
+(
+    ID UNIQUEIDENTIFIER PRIMARY KEY,
+    UserId UNIQUEIDENTIFIER NOT NULL,
+    ParentId UNIQUEIDENTIFIER NULL,
+    LocLeft NVARCHAR (50) NOT NULL,
+    LocTop NVARCHAR (50) NOT NULL,
+    Title NVARCHAR (300) NOT NULL,
+    CreatedAt DATETIME,
+)
+
+ALTER TABLE UserYoutubes ADD CONSTRAINT 
+FK_YoutubeFolderID FOREIGN KEY (FolderId) 
+REFERENCES Folders(ID)
+
+
+ALTER TABLE Folders ADD CONSTRAINT 
+FK_FoldersUserID FOREIGN KEY (UserId) 
+REFERENCES Users(ID)
+
+
+
+
+select * from YouTubes
+
 
 CREATE TABLE YouTubes
 (
     ID INT IDENTITY(1,1) PRIMARY KEY NOT NULL,
     top_ NVARCHAR (50) NOT NULL,
     left_ NVARCHAR (50) NOT NULL,
-    VideoID NVARCHAR (50) NOT NULL,
+    VideoID NVARCHAR (300) NOT NULL,
 )
 
 
@@ -48,6 +121,8 @@ REFERENCES YouTubes(ID)
 select * from Songs
 
 select * from  ArchiveSongs  left join YouTubes on ArchiveSongs.YouTubeID=Youtubes.ID
+where VideoID like '%Error%'
+
 
 select *  from  Songs  left join YouTubes on Songs.YouTubeID=Youtubes.ID
 

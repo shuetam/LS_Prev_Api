@@ -30,6 +30,12 @@ namespace Live.Core
             this.set_location();
             this.SetID(songName);
         }
+        public YouTube(string songName, bool ID)
+        {
+            this.set_location();
+            this.VideoID = "ServerError"+this.top_+this.left_;
+            Console.WriteLine($"{songName} - to many reqests.");
+        }
 
          public YouTube(RadioSong radio_song)
         {
@@ -70,7 +76,7 @@ namespace Live.Core
 
         private void SetID(string name)
         {
-            string googleKey = new GoogleKey().googleKey;
+             string googleKey = new GoogleKey().googleKey;
 
             string query = $"https://www.googleapis.com/youtube/v3/search/?part=snippet%20&maxResults=1&q={name}&key={googleKey}";
             string json = "Error";
@@ -94,17 +100,17 @@ namespace Live.Core
            
 
         var reg = new Regex(pattern);
-        string ID = ID = "!!ID!!";
+        string ID  = "ApiError"+this.top_+this.left_;
         if(reg.IsMatch(json))
         {
         ID = reg.Matches(json).Select(s => s.Groups[1].Value).ToArray()[0];
         this.VideoID = ID;
-        Console.WriteLine("--------------F R O M   A P I-----------------");
+     //   Console.WriteLine("--------------F R O M   A P I-----------------");
         Console.WriteLine(name);
-        Console.WriteLine(ID);
+      //  Console.WriteLine(ID);
         }
        else
-        {
+        { 
            SetIDFromYouTube(name);
         }
 
@@ -123,6 +129,10 @@ namespace Live.Core
 
         string query = "https://www.youtube.com/results?search_query=" + q;
         string htmlCode = "Error";
+            
+        string pattern = "watch[?]{1}v[=]{1}([^\"]+)[\"]{1}";
+        var reg = new Regex(pattern);
+        string ID = "Error"+this.top_+this.left_;
            try 
            {
             WebRequest request = WebRequest.Create(query); 
@@ -133,29 +143,31 @@ namespace Live.Core
             htmlCode = reader.ReadToEnd();  
             reader.Close();
             response.Close();
+
+            if(reg.IsMatch(htmlCode))
+            {
+            ID = reg.Matches(htmlCode).Select(s => s.Groups[1].Value).ToArray()[0];
+            }
+            if(ID.Length > 30)
+            {
+                ID = "Error"+this.top_+this.left_;
+            }
+            Random rnd = new Random();
+            int sek = rnd.Next(2000, 5000);
+        //  Console.WriteLine("----------------F R O M   H T T P-----------------------");
+          Console.WriteLine(name + " - from youtube");
+        //  Console.WriteLine(ID);
+        //  Console.WriteLine("Sleep--- " + sek);
+            System.Threading.Thread.Sleep(sek);
+            this.VideoID = ID;
            }
            catch(Exception e)
            {
                Console.WriteLine(e.Message);
+                this.VideoID = "ServerError"+this.top_+this.left_;
            }
-        string pattern = "watch[?]{1}v[=]{1}([^\"]+)[\"]{1}";
-        var reg = new Regex(pattern);
-        string ID = ID = "!!ID!!"+this.top_+this.left_;
-        if(reg.IsMatch(htmlCode))
-        {
-        ID = reg.Matches(htmlCode).Select(s => s.Groups[1].Value).ToArray()[0];
-        }
-        if(ID.Length > 30)
-        {
-            ID = "!!ID!!"+this.top_+this.left_;
-        }
-        Random rnd = new Random();
-        int sek = rnd.Next(500, 1500);
-        Console.WriteLine("----------------F R O M   H T T P-----------------------");
-        Console.WriteLine(name);
-        Console.WriteLine(ID);
-        System.Threading.Thread.Sleep(sek);
-        this.VideoID = ID;
+
+
         }
     }
 }

@@ -8,6 +8,9 @@ using Microsoft.Extensions.Configuration;
 
 public class LiveContext : DbContext
 {
+    public DbSet<User> Users {get; set;}
+    public DbSet<UserYoutube> UserYoutubes {get; set;}
+    public DbSet<Folder> Folders {get; set;}
     public DbSet<RadioSong> RadioSongs {get; set;}
     public DbSet<Song> Songs {get; set;}
     public DbSet<ArchiveSong> ArchiveSongs {get; set;}
@@ -19,24 +22,22 @@ public class LiveContext : DbContext
         _sqlSettings = SqlSettings;
     } 
 
-
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
-        
         optionsBuilder.UseSqlServer(_sqlSettings.ConnectionString);
- 
     }
+        
+ 
 
     protected override void OnModelCreating(ModelBuilder modelBuider)
     {
         var YouTubeBuilder = modelBuider.Entity<YouTube>();
         YouTubeBuilder.HasKey(x => x.ID);
 
-        
-
         var SongBuilder = modelBuider.Entity<Song>();
         SongBuilder.HasKey(x => x.ID);
 
+        var UserBuilder = modelBuider.Entity<User>();
+        UserBuilder.HasKey(x => x.ID);
     }
-
 }

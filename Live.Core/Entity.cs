@@ -11,10 +11,7 @@ namespace Live.Core
     public class Entity
     {
         public Guid ID {get; protected set;}
-
-
-
-    public Entity()
+        public Entity()
         {
             this.ID = new Guid();
         }

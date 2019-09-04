@@ -14,6 +14,7 @@ using System.Xml;
 using AutoMapper;
 using Live.Mapper;
 using Newtonsoft.Json;
+using System.Web.Http;
 
 namespace Live
 {
@@ -23,7 +24,7 @@ namespace Live
         {
             Configuration = configuration;
         }
-
+readonly string MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
         public IConfiguration Configuration { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
@@ -38,33 +39,53 @@ namespace Live
             services.AddMvc().AddJsonOptions(j => j.SerializerSettings.Formatting = Newtonsoft.Json.Formatting.Indented);
             services.AddScoped<IRadioSongRepository, RadioSongRepository>();
             services.AddScoped<ISongsRepository, SongsRepository>();
+			services.AddScoped<IUserRepository, UserRepository>();
+            services.AddScoped<IUserDesktopRepository, UserDesktopRepository>();
             services.AddSingleton(AutoMapperConfig.Initialize());
             services.AddSingleton(sql_connection);
-            services.AddCors();
+    /*         services.AddCors(options => options.AddPolicy(MyAllowSpecificOrigins, builder =>
+            {
+                builder.WithOrigins("http://localhost:3000",
+                                    "http://localhost:3001");
+            })); */
 
             // var connectionString = Configuration.GetSection("SqlConnecting").Get<SqlConnectingSettings>().ConnectionString; 
+   services.AddCors(o => o.AddPolicy("MyPolicy", builder =>
+    {
+        builder.AllowAnyOrigin()
+               .AllowAnyMethod()
+               .AllowAnyHeader();
+    }));
+
 
             services.AddDbContext<LiveContext>(options => options.UseSqlServer(connectionString));
+            services.AddAuthentication()
+                .AddGoogle(options =>
+                {
+                    options.ClientId = Configuration["auth:google:clientid"];
+                    options.ClientSecret = Configuration["auth:google:clientsecret"];
+                });
+       
+       
+       
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
-            app.UseCors(options => options.WithOrigins("http://localhost:3000").AllowAnyMethod()); // allow all methods on my api port
-
-            if (env.IsDevelopment())
+            //app.UseCors(options => options.WithOrigins("http://localhost:3000/songs").AllowAnyMethod()); // allow all methods on my api port
+            //app.UseCors(options => options.WithOrigins("http://localhost:3001").AllowAnyMethod());
+          /*   if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
             }
-
+             else */
+      
+        //app.UseCors(MyAllowSpecificOrigins);
+        app.UseCors("MyPolicy");
             app.UseMvc();
+            app.UseAuthentication();
         }
-
-
-
-
-
-
 
     }
 }
