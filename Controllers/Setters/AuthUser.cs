@@ -12,6 +12,7 @@ namespace Live.Controllers
     public class AuthUser 
     {
         public string userId {get; set;}
+        public string folderId {get; set;}
     }
 
 }

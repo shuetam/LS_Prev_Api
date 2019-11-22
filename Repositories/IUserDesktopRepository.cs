@@ -10,12 +10,22 @@ namespace Live.Repositories
 {
     public interface IUserDesktopRepository
     {   
-        Task<List<IconDto>> GetAllIconsForUserAsync(string userId);
-        Task AddYouTubeAsync(AddEntity addYoutube);
-        Task CreateFolderAsync(Guid userId, string Title);
-        Task AddEntityToFolder(Guid userId);
+        Task<List<IconDto>> GetAllIconsForUserAsync(string userId, string folderId);
+        Task<List<IconDto>> GetAllImagesForUserAsync(string userId, string folderId);
+        
+        Task AddYouTubeAsync(EntitySetter addYoutube);
+        Task AddImageAsync(EntitySetter addYoutube);
+        Task<FolderDto> CreateFolderAsync(Guid userId, string Title);
+        Task<object> AddEntityToFolder(Guid userId, string folderId, string entityId, string entityType);
+    
         Task RemoveEntity(Guid userId, string entityId, string entityType);
-         Task<List<IconDto>> GetAllFoldersForUserAsync(string userId);
+        Task MoveEntityFromFolder(Guid userId, string entityId, string entityType);
+        Task<List<FolderDto>> GetAllFoldersForUserAsync(string userId);
+        Task<List<string>> GetAllIconsIdAsync(string userId);
+
+        Task SaveIconsLocations(string userId, List<EntitySetter> icons);
+        Task<List<IconDto>> GetNewIcons( Guid userId, string url);
+
         
     }
 

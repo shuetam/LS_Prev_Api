@@ -32,6 +32,12 @@ SELECT * FROM UserYoutubes
 delete from UserYoutubes
 WHERE LocLeft like '%20%'
 
+alter table UserYoutubes
+add AddedToFolder DATETIME NULL
+
+alter table UserImages
+add UrlAddress NVARCHAR (MAX)  NULL
+
 CREATE TABLE UserYoutubes
 (
     ID UNIQUEIDENTIFIER PRIMARY KEY,
@@ -44,7 +50,42 @@ CREATE TABLE UserYoutubes
     CreatedAt DATETIME,
 )
 
+
+CREATE TABLE UserImages
+(
+    ID UNIQUEIDENTIFIER PRIMARY KEY,
+    UserId UNIQUEIDENTIFIER NOT NULL,
+    FolderId UNIQUEIDENTIFIER NULL,
+    Source NVARCHAR (MAX) NOT NULL,
+    LocLeft NVARCHAR (50) NOT NULL,
+    LocTop NVARCHAR (50) NOT NULL,
+    Title NVARCHAR (300) NOT NULL,
+    CreatedAt DATETIME,
+    AddedToFolder DATETIME NULL,
+    UrlAddress NVARCHAR (MAX) NOT  NULL
+)
+
+select * from UserImages
+
+DROP TABLE UserImages
+
+ALTER TABLE UserImages ADD CONSTRAINT 
+FK_ImageUserID FOREIGN KEY (UserId) 
+REFERENCES Users(ID)
+
+ALTER TABLE UserImages ADD CONSTRAINT 
+FK_ImageFolderID FOREIGN KEY (FolderId) 
+REFERENCES Folders(ID)
+
 drop table UserYoutubes
+
+UPDATE Folders
+SET LocLeft = '50vw'
+WHERE ParentId is NULL;
+
+UPDATE UserYoutubes
+SET LocLeft = '50vw', LocTop = '10vh'
+WHERE LocLeft like '%110%';
 
 
 ALTER TABLE UserYoutubes ADD CONSTRAINT 
@@ -53,6 +94,9 @@ REFERENCES Users(ID)
 
 
 SELECT * FROM Folders
+
+DELETE FROM Folders WHERE
+Title like '%www%'
 
 
 CREATE TABLE Folders
@@ -78,7 +122,7 @@ REFERENCES Users(ID)
 
 
 
-select * from YouTubes
+select * from YouTubes where VideoID like '%Error%'
 
 
 CREATE TABLE YouTubes
@@ -99,7 +143,26 @@ CREATE TABLE Songs
     YouTubeID  INT  NULL,
 )
 
-SELECT * FROM Songs
+CREATE TABLE TVMovies
+(
+    ID UNIQUEIDENTIFIER PRIMARY KEY,
+    Title NVARCHAR (300) NOT NULL,
+    TrailerSearch NVARCHAR (300) NOT NULL,
+    Station NVARCHAR (30) NULL,
+    Rating NVARCHAR (20) NULL,
+    PlayAt DATETIME NULL,
+    YouTubeID  INT  NULL,
+)
+
+ALTER TABLE TVMovies ADD CONSTRAINT 
+FK_Movie_YouTube FOREIGN KEY (YouTubeID) 
+REFERENCES YouTubes(ID)
+
+
+DELETE FROM TVMovies WHERE
+Station like 'TVP ABC'
+
+SELECT * FROM TVMovies where Title like '%Logan%'
 
 
 CREATE TABLE ArchiveSongs
@@ -123,6 +186,8 @@ select * from Songs
 select * from  ArchiveSongs  left join YouTubes on ArchiveSongs.YouTubeID=Youtubes.ID
 where VideoID like '%Error%'
 
+select * from  TVMovies  left join YouTubes on TVMovies.YouTubeID=Youtubes.ID
+where VideoID like '%Error%'
 
 select *  from  Songs  left join YouTubes on Songs.YouTubeID=Youtubes.ID
 

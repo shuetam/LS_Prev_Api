@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using Live.Core;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace Live.Repositories
 {
@@ -30,6 +31,7 @@ namespace Live.Repositories
         {
             User user = _liveContext.Users.FirstOrDefault(x => x.UserEmail == email && x.UserSocialId == userId && x.IsActive);
 
+
             if(user == null)
             {
                 Console.WriteLine("Save user to database");
@@ -41,7 +43,8 @@ namespace Live.Repositories
             }
             else 
             {
-                Console.WriteLine("login existing user");
+                //Console.WriteLine($"login existing user:  {user.UserYoutubes.Count}");
+                //user.UserYoutubes.Add(new UserYoutube("dVVsa","dVVVas","dVVfs","gdVVV"));
                 user.NextLogin();
                 _liveContext.Update(user);
                 await _liveContext.SaveChangesAsync();

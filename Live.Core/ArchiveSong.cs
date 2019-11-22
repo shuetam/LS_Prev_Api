@@ -34,19 +34,12 @@ namespace Live.Core
             this.YouTube = new YouTube(song);
         }
 
-    public ArchiveSong(Song song)
+        public ArchiveSong(Song song)
         {
 
             this.Name = song.Name;
             this.YouTube = song.YouTube;
         }
-
-        
-        public void  ReplaceBush(string name)
-            {
-                
-                this.Name = name;
-            }
 
         public void ChangeYouTubeId(string id)
         {

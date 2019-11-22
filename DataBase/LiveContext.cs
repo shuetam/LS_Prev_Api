@@ -10,10 +10,12 @@ public class LiveContext : DbContext
 {
     public DbSet<User> Users {get; set;}
     public DbSet<UserYoutube> UserYoutubes {get; set;}
+    public DbSet<UserImage> UserImages {get; set;}
     public DbSet<Folder> Folders {get; set;}
     public DbSet<RadioSong> RadioSongs {get; set;}
     public DbSet<Song> Songs {get; set;}
     public DbSet<ArchiveSong> ArchiveSongs {get; set;}
+    public DbSet<TVMovie> TVMovies {get; set;}
     public DbSet<YouTube> YouTubes {get; set;}
 
      private readonly SqlConnectingSettings _sqlSettings;
@@ -29,15 +31,17 @@ public class LiveContext : DbContext
         
  
 
-    protected override void OnModelCreating(ModelBuilder modelBuider)
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        var YouTubeBuilder = modelBuider.Entity<YouTube>();
+        var YouTubeBuilder = modelBuilder.Entity<YouTube>();
         YouTubeBuilder.HasKey(x => x.ID);
 
-        var SongBuilder = modelBuider.Entity<Song>();
+        var SongBuilder = modelBuilder.Entity<Song>();
         SongBuilder.HasKey(x => x.ID);
 
-        var UserBuilder = modelBuider.Entity<User>();
+        var UserBuilder = modelBuilder.Entity<User>();
         UserBuilder.HasKey(x => x.ID);
+
+
     }
 }

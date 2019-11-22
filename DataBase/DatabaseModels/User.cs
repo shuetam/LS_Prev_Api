@@ -12,7 +12,8 @@ public class User : Entity
     public int LoginsCount {get; protected set;}
     public bool IsActive {get; protected set;}
     public string AuthType {get; protected set;}
-    public List<UserYoutube> UserYoutubes {get; protected set;}
+    public List<UserYoutube> UserYoutubes {get; set;}
+     public List<UserImage> UserImages {get; set;}
 
     protected User()
     {

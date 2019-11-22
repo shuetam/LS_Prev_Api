@@ -1,11 +1,11 @@
 using System;
 
-public class UserYoutube : Live.Core.Entity
+public class UserImage : Live.Core.Entity
 {
     public Guid UserId {get; protected set;}
-
     public Guid? FolderId {get; protected set;}
-    public string VideoId {get; protected set;}
+    public string UrlAddress {get; protected set;}
+    public string Source {get; protected set;}
     public string LocLeft {get; protected set;}
     public string LocTop {get; protected set;}
     public string Title {get; protected set;}
@@ -14,36 +14,36 @@ public class UserYoutube : Live.Core.Entity
     public DateTime? AddedToFolder {get; protected set;}
     
 
-        public UserYoutube()
+        public UserImage()
         {
         }
 
-        public UserYoutube(string userId, string videoId, string title, string left, string top, string folderId) 
+        public UserImage(string userId, string source, string url, string title, string left, string top, string folderId) 
         {
             UserId = new Guid(userId);
             Title = title;
+            UrlAddress = url;
 
-        if(string.IsNullOrEmpty(folderId))
-        {
-            FolderId = null;
-        }
-        else 
-        {
-            FolderId =  new Guid(folderId);
-        }
+                if(string.IsNullOrEmpty(folderId))
+                {
+                    FolderId = null;
+                }
+                else 
+                {
+                    FolderId =  new Guid(folderId);
+                }
 
-            VideoId = videoId;
+            Source = source;
             LocLeft = left;
             LocTop = top;
             CreatedAt = DateTime.Now;
         }
 
-          public UserYoutube( string videoId, string title, string left, string top) 
+          public UserImage( string source, string title, string left, string top) 
         {
-            //UserId = new Guid(userId);
             Title = title;
             FolderId = null;
-            VideoId = videoId;
+            Source = source;
             LocLeft = left;
             LocTop = top;
             CreatedAt = DateTime.Now;

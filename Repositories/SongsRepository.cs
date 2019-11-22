@@ -23,7 +23,7 @@ namespace Live.Repositories
             this._autoMapper = autoMapper;
         }
 
-        public async Task<List<SongDto>> GetFromArchiveByIndex(int i, int j)
+        public async Task<List<IconDto>> GetFromArchiveByIndex(int i, int j)
         {
             var archiveSongs = await _liveContext.ArchiveSongs.Include(x=>x.YouTube).ToListAsync();
             int archCount = archiveSongs.Count;
@@ -33,7 +33,7 @@ namespace Live.Repositories
             }
 
             var songs = archiveSongs.Where(s => archiveSongs.IndexOf(s)>=i && archiveSongs.IndexOf(s)<=j).ToList();
-            return songs.Select(s =>  _autoMapper.Map<SongDto>(s)).ToList();
+            return songs.Select(s =>  _autoMapper.Map<IconDto>(s)).ToList();
         }
 
       public async Task DeleteByYouTubeId(string id)
@@ -84,7 +84,7 @@ namespace Live.Repositories
                 actuallSong.ChangeName(name);
                 _liveContext.Update(actuallSong);
             }
-   if(archiveSong != null)
+            if(archiveSong != null)
             {
             archiveSong.ChangeName(name);
 
@@ -96,22 +96,27 @@ namespace Live.Repositories
 
 
 
-        public async Task<List<SongDto>> GetAllFromArchive()
+        public async Task<List<IconDto>> GetAllFromArchive()
         {
             var archiveSongs = await _liveContext.ArchiveSongs.Include(x=>x.YouTube)
             .ToListAsync();
-           return archiveSongs.Select(s =>  _autoMapper.Map<SongDto>(s)).ToList();
+           return archiveSongs.Select(s =>  _autoMapper.Map<IconDto>(s)).ToList();
         }
 
 
-        public async Task<List<FrontSong>> GetActualByRadioAsync(List<string> stations)
+        public async Task<List<IconDto>> GetActualByRadioAsync(List<string> stations)
         {  
             var date24 = DateTime.Now.AddHours(-24);
            var all_songs =  await _liveContext.Songs.Include(s => s.YouTube).Where(s => s.PlayAt>=date24).ToListAsync();
-            // var all_songs =  await _liveContext.Songs.Include(s => s.YouTube).Where(s => s.PlayAt<date24).ToListAsync();
+            //var all_songs =  await _liveContext.Songs.Include(s => s.YouTube).Where(s => s.PlayAt<date24).ToListAsync();
             
+            foreach(var s in all_songs)
+            {
+                Console.WriteLine(s.Name);
+            }
+
             var songs = new List<Song>();
-            var songsDto = new List<FrontSong>();
+            var ytFront = new List<FrontYouTube>();
 
           foreach(string radio in stations)
           {
@@ -123,20 +128,21 @@ namespace Live.Repositories
               var song = songs[0];
               var songCount = songs.Where(s => s.YouTube.VideoID == song.YouTube.VideoID).ToList().Count;
               songs.RemoveAll(s => s.YouTube.VideoID == song.YouTube.VideoID);
-              songsDto.Add(new FrontSong(song, songCount));
+              ytFront.Add(new FrontYouTube(song, songCount));
+              Console.WriteLine(song.Name);
           }
 
-          return songsDto;
+          return ytFront.Select(x => _autoMapper.Map<IconDto>(x)).ToList();
 
         }
 
 
-        public async Task<List<FrontSong>> GetActualRandomSongs()
+        public async Task<List<IconDto>> GetActualRandomSongs()
         {  
             var date24 = DateTime.Now.AddHours(-24);
             var all_songs =  await _liveContext.Songs.Include(s => s.YouTube).Where(s => s.PlayAt>=date24).ToListAsync();
             var songs = new List<Song>();
-            var songsDto = new List<FrontSong>();
+            var songsDto = new List<FrontYouTube>();
             Random random = new Random();
            /*  var stations = new Dictionary<int, string>(){{1,"zet"},{2,"rmf"},{3,"eska"},{4, "rmfmaxx"},
            {5,"antyradio"},{6, "rmfclassic"},{8, "plus"},{9, "zloteprzeboje"},{30, "vox"},{40, "chillizet"}};
@@ -164,11 +170,15 @@ namespace Live.Repositories
           {
               var song = songs[0];
               var songCount = songs.Where(s => s.YouTube.VideoID == song.YouTube.VideoID).ToList().Count;
-              songs.RemoveAll(s => s.YouTube.VideoID == song.YouTube.VideoID);
-              songsDto.Add(new FrontSong(song, songCount));
+
+//if(!song.YouTube.VideoID.Contains("Error"))
+              // {
+                songs.RemoveAll(s => s.YouTube.VideoID == song.YouTube.VideoID);
+              // }
+              songsDto.Add(new FrontYouTube(song, songCount));
           }
 
-          return songsDto;
+          return songsDto.Select(x => _autoMapper.Map<IconDto>(x)).ToList();
 
         }
 
@@ -323,17 +333,16 @@ namespace Live.Repositories
                         song.SetWhileYoutube();
                     }
 
-                    if (song.YouTube.VideoID == "ServerError")
+                    if (song.YouTube.VideoID.Contains("FirstError"))
                     {
                         toManyReq = true;
                     }
                         await AddToArchiveAsync(song);
                 }
-          
-                    else
-                    {
-                        song.SetYoutube(archiveSong);
-                    }
+                else
+                {
+                    song.SetYoutube(archiveSong);
+                }
 
                     await _liveContext.Songs.AddAsync(song);
 

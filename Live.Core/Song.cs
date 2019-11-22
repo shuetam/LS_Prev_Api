@@ -34,7 +34,9 @@ namespace Live.Core
         {
             this.PlayAt = date; 
 
-            if(Regex.IsMatch(name , @"&#039;"))
+            name = System.Web.HttpUtility.HtmlDecode(name);
+
+/*             if(Regex.IsMatch(name , @"&#039;"))
             {
             name = Regex.Replace(name , @"&#039;", "'");
             }
@@ -52,7 +54,7 @@ namespace Live.Core
             if(Regex.IsMatch(name , "[#]{1}[^\"]+"))
             {
             name = Regex.Replace(name , "[#]{1}[^\"]+", "");
-            }
+            } */
 
             this.Name = name;
 
@@ -94,10 +96,6 @@ namespace Live.Core
             this.Name = name;
         }
 
-        public void  ReplaceBush(string name)
-            {
-                this.Name = name;
-            }
 
 
     }

@@ -37,20 +37,43 @@ namespace Live.Mapper
                 .ForMember(d => d.Email  , s => s.MapFrom(x => x.UserEmail));
 
             config.CreateMap<UserYoutube, IconDto>()
-                .ForMember(d => d.Id, s => s.MapFrom(x => x.ID.ToString()))
+                .ForMember(d => d.id, s => s.MapFrom(x => x.VideoId))
                 .ForMember(d => d.left  , s => s.MapFrom(x => x.LocLeft))
                 .ForMember(d => d.top  , s => s.MapFrom(x => x.LocTop))
-                .ForMember(d => d.videoId  , s => s.MapFrom(x => x.VideoId))
                 .ForMember(d => d.count  , s => s.MapFrom(x => "1"))
-                .ForMember(d => d.title  , s => s.MapFrom(x => x.Title));
+                .ForMember(d => d.title  , s => s.MapFrom(x => x.Title))
+                .ForMember(d => d.type  , s => s.MapFrom(x => "YT"));
 
-            config.CreateMap<Folder, IconDto>()
-                .ForMember(d => d.Id, s => s.MapFrom(x => x.ID.ToString()))
+            config.CreateMap<UserImage, IconDto>()
+                .ForMember(d => d.id, s => s.MapFrom(x => x.UrlAddress))
                 .ForMember(d => d.left  , s => s.MapFrom(x => x.LocLeft))
                 .ForMember(d => d.top  , s => s.MapFrom(x => x.LocTop))
-                .ForMember(d => d.videoId  , s => s.MapFrom(x => x.ID.ToString()))
+                .ForMember(d => d.count  , s => s.MapFrom(x => "1"))
+                .ForMember(d => d.title  , s => s.MapFrom(x => x.Title))
+                .ForMember(d => d.source  , s => s.MapFrom(x => x.Source))
+                .ForMember(d => d.type  , s => s.MapFrom(x => "IMG"));
+
+
+            config.CreateMap<FrontYouTube, IconDto>()
+                .ForMember(d => d.id, s => s.MapFrom(x => x.videoId))
+                .ForMember(d => d.left  , s => s.MapFrom(x => x.left))
+                .ForMember(d => d.top  , s => s.MapFrom(x => x.top))
+                .ForMember(d => d.count  , s => s.MapFrom(x => x.count))
+                .ForMember(d => d.title  , s => s.MapFrom(x => x.title))
+                .ForMember(d => d.type  , s => s.MapFrom(x => "YT"));
+
+
+            config.CreateMap<Folder, FolderDto>()
+                .ForMember(d => d.id, s => s.MapFrom(x => x.ID.ToString()))
+                .ForMember(d => d.left  , s => s.MapFrom(x => x.LocLeft))
+                .ForMember(d => d.top  , s => s.MapFrom(x => x.LocTop))
                 .ForMember(d => d.count  , s => s.MapFrom(x => "2"))
-                .ForMember(d => d.title  , s => s.MapFrom(x => x.Title));
+                .ForMember(d => d.icon0, s => s.MapFrom(x => x.icon0))
+                .ForMember(d => d.icon1, s => s.MapFrom(x => x.icon1))
+                .ForMember(d => d.icon2, s => s.MapFrom(x => x.icon2))
+                .ForMember(d => d.icon3, s => s.MapFrom(x => x.icon3))
+                .ForMember(d => d.title  , s => s.MapFrom(x => x.Title))
+                .ForMember(d => d.type  , s => s.MapFrom(x => "FOLDER"));
         }
         ).CreateMapper();
 

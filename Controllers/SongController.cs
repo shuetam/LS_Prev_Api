@@ -92,7 +92,7 @@ namespace Live.Controllers
             return Json(songs);
         }
 
-        [HttpGet("random")]
+        [HttpGet("radiorandom")]
         public async Task <IActionResult> GetAllRandomSongs()
         {
         
