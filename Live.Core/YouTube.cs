@@ -77,15 +77,12 @@ namespace Live.Core
         private void SetID(string name)
         {
              string googleKey = new GoogleKey().googleKey;
-//https://www.googleapis.com/youtube/v3/search/?part=snippet%20&maxResults=1&q=ariana&key=AIzaSyC2s9N7qsU48BL83Zaj-OCE6pqpvtTsxtM
-            
-//https://www.googleapis.com/youtube/v3/search/?part=snippet%20&maxResults=2&type=playlist&q=ariana vevo music&key=AIzaSyC2s9N7qsU48BL83Zaj-OCE6pqpvtTsxtM
 
             string query = $"https://www.googleapis.com/youtube/v3/search/?part=snippet%20&maxResults=1&q={name}&key={googleKey}";
             string json = "";
             try
             {
-            this.VideoID = "FirstError" + this.top;
+            this.VideoID = "Error" + this.top;
             WebRequest request = WebRequest.Create(query); 
             request.Credentials = CredentialCache.DefaultCredentials;
             WebResponse response = request.GetResponse(); 
@@ -95,7 +92,7 @@ namespace Live.Core
             reader.Close();
             response.Close();
             }
-            catch(Exception e)
+            catch(WebException e)
             {   Console.WriteLine("+++++++++++++++++++++++++++++++++++++++++++++++");
                 Console.WriteLine(e.Message);
                 Console.WriteLine("+++++++++++++++++++++++++++++++++++++++++++++++");
@@ -118,10 +115,7 @@ namespace Live.Core
         Console.WriteLine(name);
       //  Console.WriteLine(ID);
         }
-       //else
-        //{ 
-          // SetIDFromYouTube(name);
-        //}
+    
 
         }
 
