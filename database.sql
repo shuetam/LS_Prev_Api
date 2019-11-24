@@ -121,6 +121,18 @@ REFERENCES Users(ID)
 
 
 
+CREATE TABLE Bestsellers
+(
+    ID UNIQUEIDENTIFIER PRIMARY KEY,
+    Title NVARCHAR (200) NOT NULL,
+    Author NVARCHAR (200) NOT NULL,
+    ImageSrc NVARCHAR (300) NOT NULL,
+    Store NVARCHAR (50) NOT NULL,
+    Size  INT  NULL,
+    GroupNo  INT  NULL,
+)
+
+
 
 select * from YouTubes where VideoID like '%Error%'
 

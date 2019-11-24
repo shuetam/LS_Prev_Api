@@ -5,6 +5,7 @@ using System.Linq;
 using Live.Core;
 using Live;
 using Microsoft.Extensions.Configuration;
+using Live.DataBase.DatabaseModels;
 
 public class LiveContext : DbContext
 {
@@ -17,8 +18,9 @@ public class LiveContext : DbContext
     public DbSet<ArchiveSong> ArchiveSongs {get; set;}
     public DbSet<TVMovie> TVMovies {get; set;}
     public DbSet<YouTube> YouTubes {get; set;}
+    public DbSet<Bestseller> Bestsellers { get; set; }
 
-     private readonly SqlConnectingSettings _sqlSettings;
+    private readonly SqlConnectingSettings _sqlSettings;
     public LiveContext(DbContextOptions<LiveContext> options, SqlConnectingSettings SqlSettings) : base(options)
     {
         _sqlSettings = SqlSettings;

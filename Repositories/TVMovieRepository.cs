@@ -35,7 +35,7 @@ namespace Live.Repositories
         public async Task<List<IconDto>> GetActuallMovies()
         {
             var movies = await _liveContext.TVMovies.Include(x => x.YouTube)
-            .Where(x => x.PlayAt >= DateTime.Now && x.PlayAt <= DateTime.Now.AddHours(48))
+            .Where(x => x.PlayAt >= DateTime.Now.AddHours(-1) && x.PlayAt <= DateTime.Now.AddHours(48))
             .ToListAsync();
 
             var frontMovies = new List<FrontYouTube>();

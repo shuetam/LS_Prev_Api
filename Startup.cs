@@ -42,6 +42,7 @@ readonly string MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
 			services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IUserDesktopRepository, UserDesktopRepository>();
             services.AddScoped<ITVMovieRepository, TVMovieRepository>();
+            services.AddScoped<IBestsellersRepository, BestsellersRepository>();
             services.AddSingleton(AutoMapperConfig.Initialize());
             services.AddSingleton(sql_connection);
     /*         services.AddCors(options => options.AddPolicy(MyAllowSpecificOrigins, builder =>
