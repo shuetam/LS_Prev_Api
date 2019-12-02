@@ -77,14 +77,14 @@ namespace Live.Repositories
             if (DateTime.Now > lastDate || future == 0)
             {
             }
-            future = 15;
+            future = 2;
 
             Console.WriteLine(future);
 
             var allMovies = new List<TVMovie>();
 
 
-            for (int i = 5; i < future; i++)
+            for (int i = 0; i < future; i++)
             {
 
                 var date = System.DateTime.Now.AddDays(i);

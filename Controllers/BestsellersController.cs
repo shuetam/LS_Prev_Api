@@ -30,17 +30,19 @@ namespace Live.Controllers
             this._bookRepository = bookRepository;
         }
 
-        [HttpGet("takebestsellers")]
-        public async Task<IActionResult> TakeBestsellers()
+        [HttpGet("getbestsellers")]
+        public async Task<IActionResult> GetBestsellers()
         {
-            var movies = await _bookRepository.GetActuallBestsellers();
-
-            return Json(movies);
+            var books = await _bookRepository.GetActuallBestsellersAsync();
+            Console.WriteLine("------------getting books---------------");
+            Console.WriteLine(books[0].title);
+            return Json(books);
         }
 
         [HttpPost("update")]
         public async Task UpdateBestsellser()
         {
+           
             await _bookRepository.UpdateAsync();
         }
 

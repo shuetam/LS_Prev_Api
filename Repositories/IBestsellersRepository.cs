@@ -1,4 +1,5 @@
 ﻿using Live.Core;
+using Live.DataBase.DatabaseModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,7 +9,7 @@ namespace Live.Repositories
 {
     public interface IBestsellersRepository
     {
-        Task<List<IconDto>> GetActuallBestsellers();
+        Task<List<IconDto>> GetActuallBestsellersAsync();
         Task UpdateAsync();
     }
 }

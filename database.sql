@@ -132,6 +132,8 @@ CREATE TABLE Bestsellers
     GroupNo  INT  NULL,
 )
 
+select * from Bestsellers
+
 
 
 select * from YouTubes where VideoID like '%Error%'

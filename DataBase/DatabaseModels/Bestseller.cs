@@ -1,5 +1,4 @@
-﻿using Live.Business;
-using Live.Core;
+﻿using Live.Core;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,6 +15,12 @@ namespace Live.DataBase.DatabaseModels
         public int GroupNo { get; protected set; }
         public string Store { get; protected set; }
 
+        protected Bestseller()
+        {
+
+        }
+
+
         public Bestseller(Book book, int groupNo)
         {
             this.Title = book.Title;
@@ -24,6 +29,11 @@ namespace Live.DataBase.DatabaseModels
             this.GroupNo = groupNo;
             this.Size = book.Size;
             this.Store = book.Store;
+        }
+
+        public void SetGroupNo(int no)
+        {
+            this.GroupNo = no;
         }
     }
 }
