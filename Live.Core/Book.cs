@@ -23,7 +23,7 @@ namespace Live.Core
 
         public Book(string title, string author, string img, string store)
         {
-            this.Title = title;
+            this.Title =  System.Web.HttpUtility.HtmlDecode(title);
             this.Author = author;
             this.ImageSrc = img;
             this.Store = store;
@@ -31,7 +31,7 @@ namespace Live.Core
 
         public async Task SetSizeAsync()
         {
-            var cli = new WebClient();
+            var cli = new WebClient(){ Encoding = System.Text.Encoding.UTF8 };
             cli.Headers.Add("User-Agent: Other");
             await Task.Run(() =>
             {

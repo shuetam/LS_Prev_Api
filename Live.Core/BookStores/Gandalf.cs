@@ -14,13 +14,18 @@ namespace Live.Core.BookStores
         {
             var bookList = new List<Book>();
             string url = "https://www.gandalf.com.pl/bestsellery/";
-            WebClient client = new WebClient();
+            WebClient client = new WebClient(){ Encoding = System.Text.Encoding.UTF8 };
             string htmlCode = "";
 
+        try{
             await Task.Run(() =>
             {
                 htmlCode = client.DownloadString(url);
             });
+        }
+        catch {
+
+        }
 
             var htmlDoc = new HtmlDocument();
 
@@ -31,6 +36,8 @@ namespace Live.Core.BookStores
 
             var bestList = htmlDoc.DocumentNode.SelectNodes("//div[@class='content']");
 
+if(bestList != null)
+{
             foreach (var bestNode in bestList)
             {
                 try
@@ -61,12 +68,14 @@ namespace Live.Core.BookStores
                     var book = new Book(title, author, src, "Gandalf");
                     await book.SetSizeAsync();
                     bookList.Add(book);
+                    Console.WriteLine(book.Title);
                 }
                 catch (Exception e)
                 {
 
                 }
             }
+}
 
             return bookList;
         }

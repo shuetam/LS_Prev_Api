@@ -17,7 +17,7 @@ namespace Live.Live.Core.BookStores
         {
             var bookList = new List<Book>();
             string url = "https://www.profit24.pl/bestsellery-dzial-ogolny";
-            WebClient client = new WebClient();
+            WebClient client = new WebClient(){ Encoding = System.Text.Encoding.UTF8 };
             string htmlCode = "";
             client.Headers.Add("User-Agent: Other");
 
@@ -35,6 +35,8 @@ namespace Live.Live.Core.BookStores
 
             var bestBooks = htmlDoc.DocumentNode.SelectNodes("//div[@class='produktLista']");
 
+        if(bestBooks != null)
+        {
             foreach (var bestNode in bestBooks)
             {
                 try
@@ -67,13 +69,14 @@ namespace Live.Live.Core.BookStores
                     var book = new Book(title, author, src, "Profit24");
                     await book.SetSizeAsync();
                     bookList.Add(book);
-
+                Console.WriteLine(book.Title);
                 }
                 catch (Exception e)
                 {
                     Console.WriteLine(e.Message);
                 }
             }
+        }
 
             return bookList;
         }

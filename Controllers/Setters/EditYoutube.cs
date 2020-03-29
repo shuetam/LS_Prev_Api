@@ -10,7 +10,7 @@ using System.IO;
 
 namespace Live.Controllers
 {
-    public class EditSong
+    public class EditYoutube
     {
         public string name {get;  set;}
         public string youTubeId {get;  set;}

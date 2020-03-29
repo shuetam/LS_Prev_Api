@@ -22,6 +22,8 @@ CREATE TABLE Users
     AuthType NVARCHAR (10) NOT NULL
 )
 
+ALTER TABLE Users
+ADD UserRole NVARCHAR (10) NULL;
 
 SELECT * FROM Users
 
@@ -29,8 +31,20 @@ DROP TABLE Users
 
 SELECT * FROM UserYoutubes
 
+SELECT * FROM UserImages
+
 delete from UserYoutubes
 WHERE LocLeft like '%20%'
+
+UPDATE Users
+SET UserRole = 'USER'
+WHERE AuthType like 'Google' 
+
+delete from UserYoutubes
+WHERE FolderId is NULL
+
+ALTER TABLE UserImages
+ADD ImgType NVARCHAR (20) NULL;
 
 alter table UserYoutubes
 add AddedToFolder DATETIME NULL
@@ -76,12 +90,50 @@ REFERENCES Users(ID)
 ALTER TABLE UserImages ADD CONSTRAINT 
 FK_ImageFolderID FOREIGN KEY (FolderId) 
 REFERENCES Folders(ID)
+-------------------------------------------------------------
+    public Guid UserId {get; protected set;}
+    public Guid? FolderId {get; protected set;}
+    public string SpotifyId {get; protected set;}
+    public string ImgSource {get; protected set;}
+    public string LocLeft {get; protected set;}
+    public string LocTop {get; protected set;}
+    public string Title {get; protected set;}
+    public DateTime CreatedAt {get; protected set;}
+    public DateTime? AddedToFolder {get; protected set;}
+-------------------------------------------------------------
+
+
+CREATE TABLE UserSpotify
+(
+    ID UNIQUEIDENTIFIER PRIMARY KEY,
+    UserId UNIQUEIDENTIFIER NOT NULL,
+    FolderId UNIQUEIDENTIFIER NULL,
+    SpotifyId NVARCHAR (300)  NULL,
+    ImgSource NVARCHAR (MAX)  NULL,
+    LocLeft NVARCHAR (50) NOT NULL,
+    LocTop NVARCHAR (50) NOT NULL,
+    Title NVARCHAR (300) NOT NULL,
+    CreatedAt DATETIME,
+    AddedToFolder DATETIME NULL,
+)
+
+select * from UserSpotify
+
+ALTER TABLE UserSpotify ADD CONSTRAINT 
+FK_SpotifyUserID FOREIGN KEY (UserId) 
+REFERENCES Users(ID)
+
+ALTER TABLE UserSpotify ADD CONSTRAINT 
+FK_SpotifyFolderID FOREIGN KEY (FolderId) 
+REFERENCES Folders(ID)
+
+
 
 drop table UserYoutubes
 
 UPDATE Folders
 SET LocLeft = '50vw'
-WHERE ParentId is NULL;
+WHERE ParentId is NULL;  
 
 UPDATE UserYoutubes
 SET LocLeft = '50vw', LocTop = '10vh'
@@ -93,7 +145,10 @@ FK_YoutubeUserID FOREIGN KEY (UserId)
 REFERENCES Users(ID)
 
 
-SELECT * FROM Folders
+DELETE FROM UserSpotify WHERE
+SpotifyId like '%http%'
+
+SELECT * FROM UserSpotify
 
 DELETE FROM Folders WHERE
 Title like '%www%'
@@ -132,11 +187,11 @@ CREATE TABLE Bestsellers
     GroupNo  INT  NULL,
 )
 
-select * from Bestsellers
+select * from Bestsellers where Title like '%�%'
 
+Po�o�na z Auschwitz
 
-
-select * from YouTubes where VideoID like '%Error%'
+select * from YouTubes where Name like '%Race%'
 
 
 CREATE TABLE YouTubes
@@ -185,6 +240,20 @@ CREATE TABLE ArchiveSongs
     Name NVARCHAR (300) NOT NULL,
     YouTubeID  INT  NULL,
 )
+
+CREATE TABLE ArchiveMovies
+(
+    ID UNIQUEIDENTIFIER PRIMARY KEY,
+    Name NVARCHAR (300) NOT NULL,
+    YouTubeID  INT  NULL,
+)
+select * from  ArchiveMovies
+
+select * from TVMovies
+
+ALTER TABLE ArchiveMovies ADD CONSTRAINT 
+FK_YouTubeMovieArchive FOREIGN KEY (YouTubeID) 
+REFERENCES YouTubes(ID)
 
 
 ALTER TABLE Songs ADD CONSTRAINT 

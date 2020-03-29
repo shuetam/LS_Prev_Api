@@ -11,24 +11,24 @@ using System.Web.Http.Cors;
 using Newtonsoft.Json.Linq;
 using Live.Core;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 namespace Live.Controllers
 {
     [EnableCors(origins: "http://localhost:3000", headers: "*", methods: "*")]
     [Route("api/[controller]")]
-    public class SongController : Controller
+   /* [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+  [Authorize(Roles = "ADMIN")] */
+    public class SongController : LiveController
     {
-    
         private readonly  ISongsRepository _songRepository;
         
         public SongController (ISongsRepository songRepository)
         {
             this._songRepository = songRepository;
         }
-//[EnableCors(origins: "http://localhost:3000", headers: "*", methods: "*")]
-//[EnableCors("MyPolicy")]
-        [HttpPost("editsong")]
-        //[Authorize]
+
+/*         [HttpPost("editsong")]
         public async Task <IActionResult> EditSong([FromBody]EditSong editSong)
         {
             Debug.Print("EDITSONG");
@@ -41,7 +41,7 @@ namespace Live.Controllers
                 await _songRepository.ChangeName(editSong.youTubeId, editSong.newName);
             }
            return Json(editSong);
-        }
+        } */
 
         [HttpPost("update")]
         public async Task Post()
@@ -49,40 +49,40 @@ namespace Live.Controllers
            await  _songRepository.UpdateAsync();
         }
 
-        [HttpGet("allarchive")]
+/*         [HttpGet("allarchive")]
         public async Task <IActionResult> GetAllSongs()
         {
             var songs = await _songRepository.GetAllFromArchive();
             return Json(songs);
-        }
+        } */
 
-        [HttpGet("archive/{i}/{j}")]
+/*         [HttpGet("archive/{i}/{j}")]
         public async Task <IActionResult> GetArchiveSongs(int i, int j)
         {
             var songs = await _songRepository.GetFromArchiveByIndex(i, j);
             return Json(songs);
-        }
+        } */
 
-        [HttpDelete("delete/{id}")]
+/*         [HttpDelete("delete/{id}")]
         public async Task <IActionResult> DeleteSong(string id)
         {
              await _songRepository.DeleteByYouTubeId(id);
              return NoContent();
-        }
-
+        } */
+/* 
         [HttpPut("change/{Id}/{toId}")]
         public async Task <IActionResult> ChangeYouTubeId(string Id, string toId)
         {
              await _songRepository.ChangeYouTubeId(Id, toId);
              return NoContent();
-        }
+        } */
 
-        [HttpPost("changename/{Id}")]
+/*         [HttpPost("changename/{Id}")]
         public async Task <IActionResult> ChangeName(string Id, [FromBody] NameSetter Name)
         {
              await _songRepository.ChangeName(Id, Name.name);
              return NoContent();
-        }
+        } */
 
         [HttpGet("allradiosongs/{stations}")]
         public async Task <IActionResult> GetAllActualSongs(string stations)

@@ -21,7 +21,7 @@ namespace Live.Controllers
 {
     [EnableCors(origins: "http://localhost:3000", headers: "*", methods: "*")]
     [Route("api/[controller]")]
-    public class BestsellersController : Controller
+    public class BestsellersController : LiveController
     {
         private readonly IBestsellersRepository _bookRepository;
 

@@ -27,6 +27,13 @@ namespace Live.Repositories
         {
             var bestSellers = await _liveContext.Bestsellers.ToListAsync();
             
+            var unknown = bestSellers.Where(x => x.Title.Contains('�'));
+
+            foreach(var unk in unknown)
+            {
+                Console.WriteLine(unk.Title);
+            }
+
             int maxIndex = bestSellers.Select(x => x.GroupNo).Max();
             var books = new List<IconDto>();
 
@@ -52,12 +59,19 @@ namespace Live.Repositories
             await _liveContext.SaveChangesAsync();
             
             bestList.AddRange( await new Bonito().GetBestsellersAsync());
+            await _liveContext.SaveChangesAsync();
             bestList.AddRange( await new Aros().GetBestsellersAsync());
+            await _liveContext.SaveChangesAsync();
             bestList.AddRange( await new Czytam().GetBestsellersAsync());
+            await _liveContext.SaveChangesAsync();
             bestList.AddRange( await new Empik().GetBestsellersAsync());
+            await _liveContext.SaveChangesAsync();
             bestList.AddRange( await new Gandalf().GetBestsellersAsync());
+            await _liveContext.SaveChangesAsync();
             bestList.AddRange( await new Livro().GetBestsellersAsync());
+            await _liveContext.SaveChangesAsync();
             bestList.AddRange( await new Profit24().GetBestsellersAsync());
+            await _liveContext.SaveChangesAsync(); 
 
             var i = 0;
             while (bestList.Count > 0)

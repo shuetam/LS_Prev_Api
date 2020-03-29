@@ -195,7 +195,7 @@ public async Task UpdateAsync()
 
         List<Tuple<string, int>> get_names_from_url(string url, int radio)
         {
-        WebClient client = new WebClient();
+        WebClient client = new WebClient(){ Encoding = System.Text.Encoding.UTF8 };
         string htmlCode = client.DownloadString(url);
 
         string pattern = "class[=]{1}[\"]{1}title-link[\"]{1}[>]{1}([^\"]+)[<]{1}[/]{1}a[>]{1}";
@@ -237,13 +237,15 @@ public async Task UpdateAsync()
     foreach(var v in stations)
     {
             var dateNow = DateTime.Now;
-            var date24 = dateNow.AddHours(-24);
+           // var date24 = dateNow.AddHours(-24);
+           var date24 = dateNow.AddHours(-12);
             if(int.Parse(date24.Hour.ToString())%2!=0)
            {
                date24 = date24.AddHours(1);
            }
 
-        for (int j = 0;j<12;j++)
+        //for (int j = 0;j<12;j++)
+        for (int j = 0;j<6;j++)
           {
             var date = date24.ToString("dd-MM-yyyy");
             var hour1 = date24.Hour;

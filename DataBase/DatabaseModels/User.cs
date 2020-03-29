@@ -12,14 +12,17 @@ public class User : Entity
     public int LoginsCount {get; protected set;}
     public bool IsActive {get; protected set;}
     public string AuthType {get; protected set;}
+    public string UserRole {get; protected set;}
+    
     public List<UserYoutube> UserYoutubes {get; set;}
      public List<UserImage> UserImages {get; set;}
+     public List<UserSpotify> UserSpotify {get; set;}
 
     protected User()
     {
         
     }
-    public User(string userId, string userName, string userEmail, string auth)
+    public User(string userId, string userName, string userEmail, string auth, string role)
     {
         UserSocialId = userId;
         UserName = userName;
@@ -30,6 +33,7 @@ public class User : Entity
         IsActive = true;
         CreatedAt = DateTime.Now;
         LastLogin = DateTime.Now;
+        UserRole = role;
     }
 
     public void NextLogin()

@@ -9,6 +9,8 @@ public class UserImage : Live.Core.Entity
     public string LocLeft {get; protected set;}
     public string LocTop {get; protected set;}
     public string Title {get; protected set;}
+    public string ImgType {get; protected set;}
+    
     //public User User {get; protected set;}
     public DateTime CreatedAt {get; protected set;}
     public DateTime? AddedToFolder {get; protected set;}
@@ -18,9 +20,9 @@ public class UserImage : Live.Core.Entity
         {
         }
 
-        public UserImage(string userId, string source, string url, string title, string left, string top, string folderId) 
+        public UserImage(Guid userId, string source, string url, string title, string left, string top, string folderId, string type) 
         {
-            UserId = new Guid(userId);
+            UserId = userId;
             Title = title;
             UrlAddress = url;
 
@@ -37,17 +39,10 @@ public class UserImage : Live.Core.Entity
             LocLeft = left;
             LocTop = top;
             CreatedAt = DateTime.Now;
+            ImgType = type;
         }
 
-          public UserImage( string source, string title, string left, string top) 
-        {
-            Title = title;
-            FolderId = null;
-            Source = source;
-            LocLeft = left;
-            LocTop = top;
-            CreatedAt = DateTime.Now;
-        }
+
 
         public void SetFolder(Guid folderId)
         {
@@ -71,6 +66,16 @@ public class UserImage : Live.Core.Entity
         {
             this.LocLeft = left;
             this.LocTop = top;
+        }
+
+        public void ChangeTitle(string newTitle)
+        {
+
+            if(newTitle.Length > 200)
+            {
+                newTitle = newTitle.Substring(0, 100) + "...";
+            }
+            this.Title = newTitle;
         }
 
         

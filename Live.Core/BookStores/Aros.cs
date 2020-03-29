@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
@@ -14,7 +15,7 @@ namespace Live.Core.BookStores
         {
             var bookList = new List<Book>();
             string url = "https://aros.pl/";
-            WebClient client = new WebClient();
+            WebClient client = new WebClient(){ Encoding = System.Text.Encoding.UTF8 };
             string htmlCode = "";
 
             await Task.Run(() =>
@@ -37,6 +38,8 @@ namespace Live.Core.BookStores
 
             var bestList = htmlDoc.DocumentNode.SelectNodes("//tr");
 
+if(bestList != null)
+{
             foreach (var bestNode in bestList)
             {
                 try
@@ -52,20 +55,32 @@ namespace Live.Core.BookStores
                     if (bestNode.InnerHtml.Contains("autor"))
                     {
 
-                        WebClient clientBook = new WebClient();
+                        WebClient clientBook = new WebClient(){ Encoding = System.Text.Encoding.UTF8 };
                         string htmlBook = "";
 
-                        await Task.Run(() =>
+                    using (WebClient client1 = new WebClient())
+                    {
+                        var htmlData = client.DownloadData(urlAddress);
+                        htmlBook = Encoding.UTF8.GetString(htmlData);
+                    }
+
+/*                         await Task.Run(() =>
                         {
                             htmlBook = clientBook.DownloadString(urlAddress);
-                        });
+                        }); */
 
+Console.WriteLine(htmlBook);
+Console.WriteLine("===============================================================");
                         var htmlDocBook = new HtmlDocument();
+                      
                         htmlDocBook.LoadHtml(htmlBook);
 
                         var titleNode = htmlDocBook.DocumentNode.SelectSingleNode("//h1");
+
+                        //titleNode.Attributes
                         var title = titleNode.InnerHtml.Trim();
                         var mainNode = titleNode.ParentNode.ParentNode.ParentNode;
+
                         var authorNode = mainNode.InnerHtml;
                         var authorDoc = new HtmlDocument();
                             authorDoc.LoadHtml(authorNode);
@@ -80,7 +95,7 @@ namespace Live.Core.BookStores
                         var book = new Book(title, author, imgSrc, "Aros");
                         await book.SetSizeAsync();
                         bookList.Add(book);
-
+                    //Console.WriteLine(book.Title);
 
                     }
 
@@ -98,6 +113,7 @@ namespace Live.Core.BookStores
 
                 }
             }
+}
 
             return bookList;
         }

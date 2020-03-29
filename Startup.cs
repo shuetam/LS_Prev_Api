@@ -15,6 +15,14 @@ using AutoMapper;
 using Live.Mapper;
 using Newtonsoft.Json;
 using System.Web.Http;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+using Live.Settings;
+using Live.Services;
+using Newtonsoft.Json.Serialization;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc.Authorization;
 
 namespace Live
 {
@@ -24,7 +32,7 @@ namespace Live
         {
             Configuration = configuration;
         }
-readonly string MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
+        readonly string MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
         public IConfiguration Configuration { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
@@ -34,59 +42,102 @@ readonly string MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
             var connectionString = Configuration.GetConnectionString("LiveSearchDatabase");
             var sql_connection = new SqlConnectingSettings(connectionString);
 
+            services.AddMvcCore();
 
+            services.AddMvc().AddJsonOptions(j => j.SerializerSettings.ReferenceLoopHandling
+            = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
 
-            services.AddMvc().AddJsonOptions(j => j.SerializerSettings.Formatting = Newtonsoft.Json.Formatting.Indented);
+            //services.AddMvc().AddJsonOptions(j => j.SerializerSettings.Formatting = Newtonsoft.Json.Formatting.Indented);
             services.AddScoped<IRadioSongRepository, RadioSongRepository>();
             services.AddScoped<ISongsRepository, SongsRepository>();
-			services.AddScoped<IUserRepository, UserRepository>();
+            services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IUserDesktopRepository, UserDesktopRepository>();
             services.AddScoped<ITVMovieRepository, TVMovieRepository>();
             services.AddScoped<IBestsellersRepository, BestsellersRepository>();
+            services.AddScoped<IJwtService, JwtService>();
+            services.AddSingleton(Configuration.GetSection("Jwt").Get<TokenParameters>());
             services.AddSingleton(AutoMapperConfig.Initialize());
             services.AddSingleton(sql_connection);
-    /*         services.AddCors(options => options.AddPolicy(MyAllowSpecificOrigins, builder =>
-            {
-                builder.WithOrigins("http://localhost:3000",
-                                    "http://localhost:3001");
-            })); */
+            services.AddAuthorization();
+            
+            //        services.AddMvc(config =>
+            //{
+            //    var policy = new AuthorizationPolicyBuilder()
+            //        .AddAuthenticationSchemes(JwtBearerDefaults.AuthenticationScheme)
+            //        .RequireAuthenticatedUser()
+            //        .Build();
+            //    config.Filters.Add(new AuthorizeFilter(policy));
+            //});
 
-            // var connectionString = Configuration.GetSection("SqlConnecting").Get<SqlConnectingSettings>().ConnectionString; 
-   services.AddCors(o => o.AddPolicy("MyPolicy", builder =>
-    {
-        builder.AllowAnyOrigin()
-               .AllowAnyMethod()
-               .AllowAnyHeader();
-    }));
+
+            services.AddCors(o => o.AddPolicy("MyPolicy", builder =>
+            {
+                builder.AllowAnyOrigin()
+                    .AllowAnyMethod()
+                    .AllowAnyHeader();
+            }));
 
 
             services.AddDbContext<LiveContext>(options => options.UseSqlServer(connectionString));
+
             services.AddAuthentication()
-                .AddGoogle(options =>
-                {
-                    options.ClientId = Configuration["auth:google:clientid"];
-                    options.ClientSecret = Configuration["auth:google:clientsecret"];
-                });
-       
-       
-       
+               .AddGoogle(options =>
+               {
+                   options.ClientId = Configuration["auth:google:clientid"];
+                   options.ClientSecret = Configuration["auth:google:clientsecret"];
+               });
+
+
+            services.AddAuthentication(options =>
+                    options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme)
+                    .AddJwtBearer(options =>
+                    {
+                        options.RequireHttpsMetadata = false;
+                        options.TokenValidationParameters = new TokenValidationParameters
+                        {
+                            ValidateIssuer = true,
+                            ValidateAudience = false,
+                            ValidateLifetime = true,
+                            ValidateIssuerSigningKey = true,
+                            ValidIssuer = Configuration["Jwt:Issuer"],
+                            ValidAudience = Configuration["Jwt:Issuer"],
+                            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["Jwt:SigningKey"]))
+                        };
+                    });
+
+
+
+
+
+            /* var tokenParameters = Configuration.GetSection("Jwt").Get<TokenParameters>();
+                  services.AddAuthentication(options =>
+                  {
+                     options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+                  }). AddJwtBearer(options =>
+                     {
+                     options.RequireHttpsMetadata = false;
+                     options.TokenValidationParameters = new TokenValidationParameters()
+                     {
+                         ValidIssuer = tokenParameters.Issuer,
+                         ValidateAudience = false,
+                         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(tokenParameters.SigningKey))  
+                     };
+                     }); */
+
         }
+
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
-            //app.UseCors(options => options.WithOrigins("http://localhost:3000/songs").AllowAnyMethod()); // allow all methods on my api port
-            //app.UseCors(options => options.WithOrigins("http://localhost:3001").AllowAnyMethod());
-          /*   if (env.IsDevelopment())
+            if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
             }
-             else */
-      
-        //app.UseCors(MyAllowSpecificOrigins);
-        app.UseCors("MyPolicy");
+            app.UseCors("MyPolicy");
             app.UseMvc();
             app.UseAuthentication();
+
         }
 
     }

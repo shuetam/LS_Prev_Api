@@ -60,8 +60,24 @@ namespace Live.Core
             another += $"{daya} godz. {houra}||";
         }
 
+        var inTime = (movie.PlayAt - DateTime.Now).TotalMinutes;
+        var inHour = "";
+        if(inTime>0)
+        {
+        var hours = Convert.ToInt32(Math.Floor(inTime/60));
+        var min = Convert.ToInt32(Math.Floor(inTime%60));
+        //var dateStart = new DateTime(0,0,0,0,0,0);
+        //var inDate = dateStart.AddMinutes(inTime).ToString("HH:mm");
+        inHour = $"za {hours}h {min}min";
+        }
+        else 
+        {
+            inHour = "trwa";
+        }
+
         var hour = movie.PlayAt.ToString("HH:mm");
-        var title = $"\"{movie.Title}\"||{day} godz. {hour}||{another}{movie.Station}";
+        var title = $"\"{movie.Title}\"||{day} godz. {hour}||{another}{movie.Station}||[{inHour}]";
+
 
         this.title = title;
         this.videoId = movie.YouTube.VideoID;

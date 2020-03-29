@@ -43,6 +43,11 @@ namespace Live.Core
             this.set_location();
         }
 
+        public void ChangeLocation(string left, string top)
+        {
+            this.left_ = left;
+            this.top_ = top;
+        }
 
 
     private void set_location () 

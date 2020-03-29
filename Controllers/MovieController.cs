@@ -16,12 +16,13 @@ using System.IO;
 using System.Text.RegularExpressions;
 using System.Linq;
 using System.Collections.Generic;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 namespace Live.Controllers
 {
     [EnableCors(origins: "http://localhost:3000", headers: "*", methods: "*")]
 	[Route("api/[controller]")]
-    public class MovieController : Controller
+    public class MovieController : LiveController
     {
         private readonly  ITVMovieRepository _movieRepository;
         
@@ -30,6 +31,7 @@ namespace Live.Controllers
             this._movieRepository = movieRepository;
         }
 
+        
         [HttpGet("takemovies")]
         public async Task<IActionResult> TakeMovies()
         {

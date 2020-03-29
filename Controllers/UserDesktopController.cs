@@ -16,15 +16,20 @@ using System.IO;
 using System.Text.RegularExpressions;
 using System.Linq;
 using System.Collections.Generic;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+
+
 
 namespace Live.Controllers
 {
-    [EnableCors(origins: "http://localhost:3000", headers: "*", methods: "*")]
-    
-	[Route("api/[controller]")]
-    public class UserDesktopController : Controller
-    {
 
+  [EnableCors(origins: "http://localhost:3000", headers: "*", methods: "*")]
+	[Route("api/[controller]")]
+   [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]  
+   [Authorize(Roles = "USER,ADMIN")]
+    public class UserDesktopController : LiveController
+    {
         private readonly  IUserDesktopRepository _desktopRepository;
         
         public UserDesktopController (IUserDesktopRepository desktopRepository)
@@ -34,24 +39,32 @@ namespace Live.Controllers
 
 
         [HttpPost("addicon")]
-        public async Task AddIcon([FromBody] EntitySetter icon)
+        public async Task<IActionResult> AddIcon([FromBody] EntitySetter icon)
         {
            if(icon.Type == "YT")
            {
-            await _desktopRepository.AddYouTubeAsync(icon);
+            var added = await _desktopRepository.AddYouTubeAsync(icon, this.UserId);
+             return Json(added);
            }
-           if(icon.Type == "IMG")
+          if(icon.Type == "SPOTIFY")
            {
-               Console.WriteLine("I am in repository images!!!!!!!!");
-            await _desktopRepository.AddImageAsync(icon);
+            var added = await _desktopRepository.AddSpotifyAsync(icon, this.UserId);
+             return Json(added);
            }
+           if(icon.Type == "IMG" || icon.Type == "BOOK")
+           {
+            var added = await _desktopRepository.AddImageAsync(icon, this.UserId);
+            return Json(added);
+           }
+           return (Json(false));
         }
+
 
         [HttpPost("createfolder")]
         public async Task<IActionResult> CreateFolder([FromBody] EntitySetter folder)
         {
            // Console.Write(folder.Title);
-            var newFolder = await _desktopRepository.CreateFolderAsync(new Guid(folder.UserId), folder.Title);
+            var newFolder = await _desktopRepository.CreateFolderAsync(this.UserId, folder.Title);
             return Json(newFolder);
         }
 
@@ -59,44 +72,50 @@ namespace Live.Controllers
         public async Task<IActionResult> FindIconsFromUrl([FromBody] EntitySetter data)
         {
             //Console.Write(data.Title);
-            var newIcons = await _desktopRepository.GetNewIcons(new Guid(data.UserId), data.Title);
+            var newIcons = await _desktopRepository.GetNewIcons(this.UserId, data.Title);
             return Json(newIcons);
         }
-
-
 
         [HttpPost("geticons")]
         public async Task<IActionResult> GetIcons([FromBody] AuthUser user)
         {
-          var icons = await _desktopRepository.GetAllIconsForUserAsync(user.userId, user.folderId);
+          var icons = await _desktopRepository.GetAllIconsForUserAsync(this.UserId, user.folderId);
           return Json(icons);
         }
 
         [HttpPost("getimages")]
         public async Task<IActionResult> GetImages([FromBody] AuthUser user)
         {
-          var icons = await _desktopRepository.GetAllImagesForUserAsync(user.userId, user.folderId);
+          var icons = await _desktopRepository.GetAllImagesForUserAsync(this.UserId, user.folderId);
+          return Json(icons);
+        }
+
+        [HttpPost("getspotify")]
+        public async Task<IActionResult> GetSpotify([FromBody] AuthUser user)
+        {
+          var icons = await _desktopRepository.GetAllSpotifyForUserAsync(this.UserId, user.folderId);
           return Json(icons);
         }
 
         [HttpPost("getfolders")]
         public async Task<IActionResult> GetFolders([FromBody] AuthUser user)
         {
-          var icons = await _desktopRepository.GetAllFoldersForUserAsync(user.userId);
+          var icons = await _desktopRepository.GetAllFoldersForUserAsync(this.UserId);
           return Json(icons);
         }
 
         [HttpPost("geticonsid")]
         public async Task<IActionResult> GetIconsId([FromBody] AuthUser user)
         {
-          var iconsIds = await _desktopRepository.GetAllIconsIdAsync(user.userId);
+          var iconsIds = await _desktopRepository.GetAllIconsIdAsync(this.UserId);
           return Json(iconsIds);
         }
+
 
         [HttpPost("addtofolder")]
         public async Task<IActionResult> AddToFolder([FromBody] EntitySetter en)
         {
-          var data = await _desktopRepository.AddEntityToFolder(new Guid(en.UserId), en.ParentId, en.Id, en.Type);
+          var data = await _desktopRepository.AddEntityToFolder(this.UserId, en.ParentId, en.Id, en.Type);
           return Json(data);
         }
 
@@ -106,7 +125,7 @@ namespace Live.Controllers
         public async Task RemoveEntity([FromBody] EntitySetter entity)
         {
             Console.WriteLine("REMOVING  "+ entity.Id);
-           await _desktopRepository.RemoveEntity(new Guid(entity.UserId), entity.Id, entity.Type);
+           await _desktopRepository.RemoveEntity(this.UserId, entity.Id, entity.Type);
            
           //return Json(icons);
         }
@@ -115,19 +134,27 @@ namespace Live.Controllers
         [HttpPost("movefromfolder")]
         public async Task MoveEntityFromFolder([FromBody] EntitySetter entity)
         {
-           await _desktopRepository.MoveEntityFromFolder(new Guid(entity.UserId), entity.Id, entity.Type);
+           await _desktopRepository.MoveEntityFromFolder(this.UserId, entity.Id, entity.Type);
         }
 
         [HttpPost("savelocations")]
         public async Task SaveLocations([FromBody] List<EntitySetter> entities)
         {
-            Console.WriteLine("I am in savelocations");
-            var userId =  entities[0].UserId;
-            Console.WriteLine(userId);
-            Console.WriteLine(entities[0].Top);
-           await _desktopRepository.SaveIconsLocations(userId, entities);
+            //Console.WriteLine("I am in savelocations");
+            
+            //Console.WriteLine(entities[0].Top);
+           await _desktopRepository.SaveIconsLocations(this.UserId, entities);
            
           //return Json(icons);
+        }
+
+        [HttpPost("changetitle")]
+        public async Task<IActionResult> ChangeTitle([FromBody] EntitySetter entity)
+        {
+            
+           var icon = await _desktopRepository.ChangeEntityTitleAsync(entity, this.UserId);
+           return Json(icon);
+          
         }
     }
 

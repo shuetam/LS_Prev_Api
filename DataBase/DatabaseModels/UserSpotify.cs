@@ -1,53 +1,45 @@
 using System;
 
-public class UserYoutube : Live.Core.Entity
+public class UserSpotify : Live.Core.Entity
 {
     public Guid UserId {get; protected set;}
-
     public Guid? FolderId {get; protected set;}
-    public string VideoId {get; protected set;}
+    public string SpotifyId {get; protected set;}
+    public string ImgSource {get; protected set;}
     public string LocLeft {get; protected set;}
     public string LocTop {get; protected set;}
     public string Title {get; protected set;}
-    //public User User {get; protected set;}
     public DateTime CreatedAt {get; protected set;}
     public DateTime? AddedToFolder {get; protected set;}
     
 
-        public UserYoutube()
+        public UserSpotify()
         {
         }
 
-        public UserYoutube(Guid userId, string videoId, string title, string left, string top, string folderId) 
+        public UserSpotify(Guid userId, string spotifyId, string imgSrc, string title, string left, string top, string folderId) 
         {
             UserId = userId;
             Title = title;
+            SpotifyId = spotifyId;
 
-        if(string.IsNullOrEmpty(folderId))
-        {
-            FolderId = null;
-        }
-        else 
-        {
-            FolderId =  new Guid(folderId);
-        }
+                if(string.IsNullOrEmpty(folderId))
+                {
+                    FolderId = null;
+                }
+                else 
+                {
+                    FolderId =  new Guid(folderId);
+                }
 
-            VideoId = videoId;
+            ImgSource = imgSrc;
             LocLeft = left;
             LocTop = top;
             CreatedAt = DateTime.Now;
+       
         }
 
-          public UserYoutube( string videoId, string title, string left, string top) 
-        {
-            //UserId = new Guid(userId);
-            Title = title;
-            FolderId = null;
-            VideoId = videoId;
-            LocLeft = left;
-            LocTop = top;
-            CreatedAt = DateTime.Now;
-        }
+
 
         public void SetFolder(Guid folderId)
         {

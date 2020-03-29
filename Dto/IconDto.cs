@@ -16,11 +16,18 @@ namespace Live.Core
         {
           
         }
+
+
+        public IconDto(string _id, string _title)
+        {
+            this.id = _id;
+            this.title = _title;
+        }
         public IconDto(string _id, string source, string _type)
         {
             this.id = _id;
             this.type = _type;
-            this.title = source;
+            //this.title = source;
             this.setLocation(true);
             this.count = "1";
         }

@@ -10,7 +10,7 @@ using Live.Mapper;
 namespace Live.Controllers
 {
     [Route("api/[controller]")]
-    public class RadioController : Controller
+    public class RadioController : LiveController
     {
 
         private readonly  IRadioSongRepository _radioRepository;

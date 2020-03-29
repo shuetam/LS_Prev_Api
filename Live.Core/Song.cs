@@ -91,6 +91,11 @@ namespace Live.Core
             this.YouTube.VideoID = id;
         }
 
+        public void ChangeLocation(string left, string top)
+        {
+            this.YouTube.ChangeLocation(left, top);
+        }
+
         public void ChangeName(string name)
         {
             this.Name = name;

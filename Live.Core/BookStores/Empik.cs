@@ -17,14 +17,20 @@ namespace Live.Live.Core.BookStores
         {
             var bookList = new List<Book>();
             string url = "https://www.empik.com/bestsellery/ksiazki";
-            WebClient client = new WebClient();
+            WebClient client = new WebClient(){ Encoding = System.Text.Encoding.UTF8 };
             string htmlCode = "";
-            client.Headers.Add("User-Agent: Other");
+                    client.Headers.Add("User-Agent: Other");
+
+        try {
 
             await Task.Run(() =>
             {
                 htmlCode = client.DownloadString(url);
             });
+            }
+        catch {
+
+        }
 
             var htmlDoc = new HtmlDocument();
 
@@ -35,6 +41,8 @@ namespace Live.Live.Core.BookStores
 
             var bestBooks = htmlDoc.DocumentNode.SelectNodes("//div[@class='productWrapper']");
 
+        if(bestBooks != null)
+        {
             foreach (var bestNode in bestBooks)
             {
                 try
@@ -60,13 +68,14 @@ namespace Live.Live.Core.BookStores
                     var book = new Book(title, author, img, "Empik");
                     await book.SetSizeAsync();
                     bookList.Add(book);
-
+                    Console.WriteLine(book.Title);
                 }
                 catch (Exception e)
                 {
 
                 }
             }
+        }
 
             return bookList;
         }

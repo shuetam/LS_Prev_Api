@@ -14,16 +14,21 @@ namespace Live.Core.BookStores
         {
             var bookList = new List<Book>();
             string url = "https://bonito.pl/bestsellery";
-            WebClient client = new WebClient();
+            WebClient client = new WebClient(){ Encoding = System.Text.Encoding.UTF8 };
             string htmlCode = "";
+        try {
 
             await Task.Run(() =>
             {
                 htmlCode = client.DownloadString(url);
             });
-
+            }
+            catch{
+                
+            }
             var htmlDoc = new HtmlDocument();
-
+            Console.WriteLine(htmlCode);
+            Console.WriteLine("=======================================================");
             await Task.Run(() =>
             {
                 htmlDoc.LoadHtml(htmlCode);
@@ -32,6 +37,8 @@ namespace Live.Core.BookStores
             var bestListParents = htmlDoc.DocumentNode.SelectNodes("//tr").Where(x => x.OuterHtml.Contains("<h2")).ToList();
             var bestList = htmlDoc.DocumentNode.SelectNodes("//h2");
 
+if(bestList != null)
+{
             foreach (var bestNode in bestList)
             {
                 try
@@ -46,7 +53,7 @@ namespace Live.Core.BookStores
                     var book = new Book(title, author, img, "Bonito");
                     await book.SetSizeAsync();
                     bookList.Add(book);
-   
+                    //Console.WriteLine(book.Title);
                 }
                 catch (Exception e)
                 {
@@ -54,6 +61,7 @@ namespace Live.Core.BookStores
                 }
             }
 
+}
             return bookList;
         }
     }

@@ -32,6 +32,7 @@ namespace Live.Core
             string href =   "https://www.telemagazyn.pl" + hrefNode.GetAttributeValue( "href", string.Empty);
             
             string title = movieHTML.DocumentNode.Descendants("p").FirstOrDefault().InnerText;
+            title = System.Web.HttpUtility.HtmlDecode(title);
             this.Title = title;
 
             string hourClass = "left";
@@ -46,19 +47,53 @@ namespace Live.Core
 
         }
 
+
+        public TVMovie(string inHtml, string movHref, string emisionDay, bool nextDay)
+        {
+            var movieHTML = new HtmlDocument();
+
+            movieHTML.LoadHtml(inHtml);
+            var hrefNode = movieHTML.DocumentNode.SelectNodes("//a[@href]").FirstOrDefault();
+            //string href =   "https://www.telemagazyn.pl" + hrefNode.GetAttributeValue( "href", string.Empty);
+            string href =   "https://www.telemagazyn.pl" + movHref;
+            
+            string title = movieHTML.DocumentNode.Descendants("span").FirstOrDefault().InnerText;
+            title = System.Web.HttpUtility.HtmlDecode(title.Trim());
+            this.Title = title;
+           // Console.WriteLine(title);
+            //string hourClass = "left";
+            //var hour = movieHTML.DocumentNode.SelectNodes("//span[@class='" + hourClass + "']").FirstOrDefault().InnerText;
+            string hour = movieHTML.DocumentNode.Descendants("em").FirstOrDefault().InnerText;
+            var addedHours = nextDay? 24 : 0 ;
+            CultureInfo provider = CultureInfo.InvariantCulture;
+            DateTime playDate = DateTime.Parse(emisionDay + " "+hour, provider);
+            this.PlayAt = playDate.AddHours(addedHours);
+            this.SetDataFromHref(href);
+
+            //Console.WriteLine(emisionDay);
+           // Console.WriteLine(playDate.ToString("dd-MM-yyyy HH:mm:ss"));
+
+        }
+
             public void  SetYoutube()
             {
                 this.YouTube = new YouTube(this.TrailerSearch +" "+ "trailer");
               
             }
 
-            public void  SetYoutube(TVMovie movie)
+            public void SetYoutube(TVMovie movie)
             {
                 this.YouTube = movie.YouTube;
               
             }
 
-                public void SetWhileYoutube()
+              public void SetYoutubeFromArchive(ArchiveMovie movie)
+            {
+                this.YouTube = movie.YouTube;
+              
+            }
+
+            public void SetWhileYoutube()
             {
                   this.YouTube = new YouTube(this.Title, false);
             }
@@ -101,7 +136,7 @@ namespace Live.Core
 
         private void SetDataFromHref(string href)
         {
-            WebClient client = new WebClient();
+            WebClient client = new WebClient(){ Encoding = System.Text.Encoding.UTF8 };
             string htmlCode = client.DownloadString(href);
             var mainHTML = new HtmlDocument();
             mainHTML.LoadHtml(htmlCode);
@@ -117,14 +152,8 @@ namespace Live.Core
             var station = emisionHTML.DocumentNode.Descendants("a").FirstOrDefault().InnerText;
             this.Station = station;
 
-        var ATM =  System.Web.HttpUtility.HtmlDecode(station)=="ATM Rozrywka";
-        var HBO =  System.Web.HttpUtility.HtmlDecode(station)=="HBO";
-
-        if(ATM || HBO)
-        {
-            return;
-        }
-                        
+        //var ATM =  System.Web.HttpUtility.HtmlDecode(station)=="ATM Rozrywka";
+        //var HBO =  System.Web.HttpUtility.HtmlDecode(station)=="HBO";
 
             movieInfo = movieInfo.Trim().Replace("\n"," ");
 
@@ -158,7 +187,19 @@ namespace Live.Core
       
         }
 
+        public void ChangeYouTubeId(string id)
+        {
+            this.YouTube.VideoID = id;
+        }
 
+        public void ChangeLocation(string left, string top)
+        {
+            this.YouTube.ChangeLocation(left, top);
+        }
+        public void ChangeName(string name)
+        {
+            this.Title = name;
+        }
 
 
     }

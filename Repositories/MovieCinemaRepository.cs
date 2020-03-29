@@ -15,6 +15,7 @@ namespace Live.Repositories
 {
     public class MovieCinemaRepository : IMovieCinemaRepository
     {
+        
         public async Task<List<FrontYouTube>> GetActuallMovies()
         {
             throw new NotImplementedException();

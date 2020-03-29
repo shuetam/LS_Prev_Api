@@ -17,13 +17,18 @@ namespace Live.Live.Core.BookStores
         {
             var bookList = new List<Book>();
             string url = "https://czytam.pl/bestsellery.html";
-            WebClient client = new WebClient();
+            WebClient client = new WebClient(){ Encoding = System.Text.Encoding.UTF8 };
             string htmlCode = "";
 
+        try {
             await Task.Run(() =>
             {
                 htmlCode = client.DownloadString(url);
             });
+        }
+        catch {
+
+        }
 
             var htmlDoc = new HtmlDocument();
 
@@ -34,6 +39,8 @@ namespace Live.Live.Core.BookStores
 
             var bestBooks = htmlDoc.DocumentNode.SelectNodes("//div[@class='product']");
 
+if(bestBooks != null)
+{
             foreach (var bestNode in bestBooks)
             {
                 try
@@ -65,12 +72,13 @@ namespace Live.Live.Core.BookStores
                     var book = new Book(title, author, img, "Czytam");
                     await book.SetSizeAsync();
                     bookList.Add(book);
-                
+                Console.WriteLine(book.Title);
                 }
                 catch (Exception e)
                 {
 
                 }
+            }
             }
 
             return bookList;

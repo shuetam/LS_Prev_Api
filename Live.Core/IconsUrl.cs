@@ -48,8 +48,9 @@ namespace Live.Core
             var reg2 = new Regex(patternYT2);
             bool yt1 = reg1.IsMatch(url);
             bool yt2 = reg2.IsMatch(url);
-            bool insta = url.Contains("instagram");
+            bool insta = url.Contains("instagram.com/p/");
             bool is_Src = isSrc(url, imagesF);
+            bool isSpotify = url.Contains("iframe") && url.Contains("spotify");
 
 
             if (is_Src)
@@ -72,55 +73,104 @@ namespace Live.Core
             }
             if (insta)
             {
+                url = url.Replace("?utm_source=ig_web_copy_link", "");
 
-                WebClient client = new WebClient();
-                //var uri = new Uri(url);
-                string htmlCode = "";
-
-                await Task.Run(() =>
+                if(url[url.Length-1] != '/')
                 {
-                    htmlCode = client.DownloadString(url);
-                });
-                //client.DownloadStringAsync(uri);
+                    url += '/';
+                }
+                string src = url + "media/?size=l";
+                icons.Add(new IconDto(src, url, "IMG"));
 
-                /* client.DownloadStringCompleted += (sender, e) =>
-                {
-                    htmlCode = e.Result;
-                }; */
+            }
+            if(isSpotify) 
+            {
+                    var doc = new HtmlDocument();
+                    doc.LoadHtml(url);
+                    var srcNode = doc.DocumentNode.SelectSingleNode("//iframe");
+                    var spotifyId = srcNode.Attributes["src"].Value.Trim();
+                    var spotPattern = "[%]{1}.*";
+                    var spotReg = new Regex(spotPattern);
+                    spotifyId = spotReg.Replace(spotifyId, "");
+                    var imgAddress = spotifyId.Replace("embed/", "");
 
-                string instaPattern = "[\"]display_url[\"]{1}[:]{1}[\"]{1}([^\"]+)";
-                //string instaPattern =  "display_url";
-                var instareq = new Regex(instaPattern);
-                //this.IDS.Add(new IconDto( instareq.Matches(htmlCode).Select(s => s.Groups[1].Value).ToArray()[0], "IMG"));
-                Console.WriteLine("MACHES:");
-                var maches = instareq.Matches(htmlCode).Select(s => s.Groups[1].Value).ToArray();
-                if (maches.Count() > 0)
-                {
-                    foreach (var mach in maches)
+                    var spotIcon = new IconDto(spotifyId, "", "SPOTIFY");
+
+                    WebClient client = new WebClient(){ Encoding = System.Text.Encoding.UTF8 };
+                    string htmlCode = "";
+
+                    await Task.Run(() =>
                     {
-                        //Console.WriteLine(mm);
-                        var src = (maches[0].Split('\\').Count() > 0) ? mach.Split('\\')[0] : "";
-                        icons.Add(new IconDto(src, url, "IMG"));
+                        try{
+                        htmlCode = client.DownloadString(imgAddress);
+                        }
+                        catch
+                        {  
+                        }
+
+                    });
+                   // Console.WriteLine(htmlCode);
+                    
+                var imgHTML = new HtmlDocument();
+                imgHTML.LoadHtml(htmlCode);
+                var imgNode = imgHTML.DocumentNode.SelectSingleNode("//div[@class='cover-art-image']");
+                spotIcon.source = "https://developer.spotify.com/assets/branding-guidelines/icon4@2x.png";
+
+                if(imgNode == null)
+                {
+                    imgNode = imgHTML.DocumentNode.SelectSingleNode("//div[@class='bg lazy-image']");
+                }
+
+            if(imgNode != null)
+            {
+                var imgSrcAttribute = imgNode.Attributes["style"];
+                var imgDataAttribute = imgNode.Attributes["data-src"];
+
+                if(imgSrcAttribute != null)
+                {
+                    var imgSrcPattern =  new Regex("url[(]{1}([^)]+)[)]{1}");
+                    //Console.WriteLine(imgSrcAttribute);
+
+                    if(imgSrcPattern.IsMatch(imgSrcAttribute.Value)) 
+                    {
+                        var imgSrc =  imgSrcPattern.Matches(imgSrcAttribute.Value).Select(s => s.Groups[1].Value.Trim()).ToList();
+                        if(imgSrc.Count>0)
+                        {
+                            spotIcon.source = "https:"+imgSrc[0];
+                        }
+                        //Console.WriteLine(imgSrc[0]);
                     }
                 }
+                 if(imgDataAttribute != null) 
+                {
+                    var imgSrcAttributeValue = imgDataAttribute.Value;
+                    if(!string.IsNullOrEmpty(imgSrcAttributeValue))
+                    {
+                    spotIcon.source = "https:" + imgSrcAttributeValue;
+                    }
+
+                }
+
+            }
+         
+            //Console.WriteLine(spotIcon.source);
+                 icons.Add(spotIcon);
+
             }
 
-
-
-            if (!yt1 && !yt2 && !insta && !is_Src)
+            if (!yt1 && !yt2 && !insta && !is_Src && !isSpotify)
             {
                 var mainHTML = new HtmlDocument();
                 string host = "";
                 try
-                {
-
-
-                    WebClient client = new WebClient();
+                {   
+                    WebClient client = new WebClient(){ Encoding = System.Text.Encoding.UTF8 };
                     string htmlCode = "";
 
                     await Task.Run(() =>
                     {
                         htmlCode = client.DownloadString(url);
+                        
                     });
 
                     var uri = new Uri(url);
@@ -172,45 +222,6 @@ namespace Live.Core
                                 src = "http://" + src;
                             }
 
-                            //Console.WriteLine(src); 
-
-                            try
-                            {
-                                //await Task.Run(() => {
-                                byte[] response = await new System.Net.WebClient().DownloadDataTaskAsync(src);
-                                //});
-
-                            }
-                            catch (Exception e)
-                            {
-                                Console.WriteLine("---------------------");
-                                Console.WriteLine(src);
-                                Console.WriteLine("---------------------");
-                                src = httpReg.Replace(src, "");
-                                src = "http://" + host + "/" + src;
-                            }
-
-
-
-                            // Console.WriteLine(response);
-
-                            // if(response.Length==0)
-                            // {
-                            // src = "http://"  + src;
-                            //}
-                            //if(!httpReg.IsMatch(src))
-                            //{
-                            //src = "http://" + src;
-                            //}
-
-                            // if(!httpReg.IsMatch(src))
-                            // {
-                            // src = "http://" + host + "/" + src;
-                            // }
-
-                            // await Task.Run(() => {
-                            byte[] response1 = await new System.Net.WebClient().DownloadDataTaskAsync(src);
-                            //});
 
                             if (!icons.Any(x => x.id == src))
                             {

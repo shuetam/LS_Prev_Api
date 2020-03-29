@@ -17,14 +17,19 @@ namespace Live.Live.Core.BookStores
         {
             var bookList = new List<Book>();
             string url = "https://www.inbook.pl/bestsellers/list/2";
-            WebClient client = new WebClient();
+            WebClient client = new WebClient(){ Encoding = System.Text.Encoding.UTF8 };
             string htmlCode = "";
             client.Headers.Add("User-Agent: Other");
 
+            try{
             await Task.Run(() =>
             {
                 htmlCode = client.DownloadString(url);
             });
+            }
+            catch{
+                
+            }
 
             var htmlDoc = new HtmlDocument();
 
@@ -35,6 +40,8 @@ namespace Live.Live.Core.BookStores
 
             var bestBooks = htmlDoc.DocumentNode.SelectNodes("//div[@class='product-box text-center product-box-default']");
 
+if(bestBooks != null)
+{
             foreach (var bestNode in bestBooks)
             {
                 try
@@ -65,6 +72,7 @@ namespace Live.Live.Core.BookStores
                     Console.WriteLine(e.Message);
                 }
             }
+}
 
             return bookList;
         }

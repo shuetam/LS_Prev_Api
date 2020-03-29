@@ -12,10 +12,12 @@ public class LiveContext : DbContext
     public DbSet<User> Users {get; set;}
     public DbSet<UserYoutube> UserYoutubes {get; set;}
     public DbSet<UserImage> UserImages {get; set;}
+    public DbSet<UserSpotify> UserSpotify {get; set;}
     public DbSet<Folder> Folders {get; set;}
     public DbSet<RadioSong> RadioSongs {get; set;}
     public DbSet<Song> Songs {get; set;}
     public DbSet<ArchiveSong> ArchiveSongs {get; set;}
+    public DbSet<ArchiveMovie> ArchiveMovies {get; set;}
     public DbSet<TVMovie> TVMovies {get; set;}
     public DbSet<YouTube> YouTubes {get; set;}
     public DbSet<Bestseller> Bestsellers { get; set; }

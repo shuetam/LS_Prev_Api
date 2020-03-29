@@ -14,13 +14,14 @@ using System;
 using System.Net;
 using System.IO;
 using System.Text.RegularExpressions;
+using System.Security.Claims;
 
 namespace Live.Controllers
 {
     [EnableCors(origins: "http://localhost:3000", headers: "*", methods: "*")]
     
 	[Route("api/[controller]")]
-    public class SocialUserController : Controller
+    public class SocialUserController : LiveController
     {
         private readonly  IUserRepository _userRepository;
         
@@ -105,25 +106,6 @@ namespace Live.Controllers
 
 
                 }
-
-
-/* 
-			string user1 = @"{
-                'id': 'Mateusz Bieda',
-                'type': '2652705674780591',
-                'Email': 'fggfgfgfgfgemail'
-                    }";
-
-			UserDto userObject = JsonConvert.DeserializeObject<UserDto>(user);
-
-                if(userObject.Email == null)
-                {
-                    return Json("Connot do this men!");
-                }
-                else {
-
-                } */
-
 
             return Json(error);
 

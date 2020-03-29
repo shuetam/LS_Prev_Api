@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using Live.Core;
+using Live.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -14,11 +15,13 @@ namespace Live.Repositories
 
         private readonly LiveContext _liveContext;
         private readonly IMapper _autoMapper;
+        private readonly IJwtService _jwtService;
 
-        public UserRepository(LiveContext liveContext, IMapper autoMapper )
+        public UserRepository(LiveContext liveContext, IMapper autoMapper, IJwtService jwtService )
         {
             this._liveContext = liveContext;
             this._autoMapper = autoMapper;
+            this._jwtService = jwtService;
         }
         
         Task<List<UserDto>> IUserRepository.GetAllAsync()
@@ -35,10 +38,11 @@ namespace Live.Repositories
             if(user == null)
             {
                 Console.WriteLine("Save user to database");
-                User newUser = new User(userId, name, email, authType);
+                User newUser = new User(userId, name, email, authType, "USER");
                 await _liveContext.AddAsync(newUser);
                 await _liveContext.SaveChangesAsync();
                 var userDto = _autoMapper.Map<UserDto>(newUser);
+                userDto.JwtToken = _jwtService.CreateToken(newUser.ID, newUser.UserRole).Token;
                 return userDto;
             }
             else 
@@ -50,8 +54,9 @@ namespace Live.Repositories
                 await _liveContext.SaveChangesAsync();
                 
             }
-           
-            return _autoMapper.Map<UserDto>(user);
+            var userDtoExist = _autoMapper.Map<UserDto>(user);
+            userDtoExist.JwtToken = _jwtService.CreateToken(user.ID, user.UserRole).Token;
+            return userDtoExist;
         }
     }
 

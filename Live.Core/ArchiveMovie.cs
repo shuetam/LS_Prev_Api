@@ -10,28 +10,24 @@ using System.IO;
 
 namespace Live.Core
 {
-    public class ArchiveSong : Entity
+    public class ArchiveMovie : Entity
     {
         public string Name {get; protected set;}
         public YouTube YouTube {get; protected set;}
-/* 
-        public Song(string station, Song archive_song)
-        {
-            this.PlayAt = DateTime.Now;
-            this.Station = station;
-            this.Name= archive_song.Name;
-            this.YouTube = archive_song.YouTube;
-        } */
 
-       protected ArchiveSong()
+       protected ArchiveMovie()
         {}
-    
+       
+    public void ChangeLocation(string left, string top)
+        {
+            this.YouTube.ChangeLocation(left, top);
+        }
 
-        public ArchiveSong(Song song)
+        public ArchiveMovie(TVMovie movie)
         {
 
-            this.Name = song.Name;
-            this.YouTube = song.YouTube;
+            this.Name = movie.TrailerSearch;
+            this.YouTube = movie.YouTube;
         }
 
         public void ChangeYouTubeId(string id)
@@ -39,10 +35,6 @@ namespace Live.Core
             this.YouTube.VideoID = id;
         }
 
-public void ChangeLocation(string left, string top)
-        {
-            this.YouTube.ChangeLocation(left, top);
-        }
         public void ChangeName(string name)
         {
             this.Name = name;

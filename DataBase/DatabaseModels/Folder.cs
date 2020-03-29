@@ -13,6 +13,7 @@ public class Folder : Live.Core.Entity
     public DateTime CreatedAt {get; protected set;}
     public List<UserYoutube> UserYouTubes {get; protected set;}
     public List<UserImage> UserImages {get; protected set;}
+    public List<UserSpotify> UserSpotify {get; protected set;}
 
         public string icon0 {get => four[0];}
         public string icon1 {get => four[1];}
@@ -52,10 +53,15 @@ public class Folder : Live.Core.Entity
         var listImg = this.UserImages.OrderByDescending(x=> x.AddedToFolder)
         .Select(x => new FolderDto(x.AddedToFolder, x.UrlAddress)).ToList()
         .Take(4);
+
+        var listSpot = this.UserSpotify.OrderByDescending(x=> x.AddedToFolder)
+        .Select(x => new FolderDto(x.AddedToFolder, x.ImgSource)).ToList()
+        .Take(4);
         
         var list = new List<FolderDto>();
         list.AddRange(listYT);
         list.AddRange(listImg);
+         list.AddRange(listSpot);
         
        list = list.OrderByDescending(x => x.DateCreated).ToList();
 
@@ -93,6 +99,7 @@ public class Folder : Live.Core.Entity
             CreatedAt = DateTime.Now;
             UserYouTubes = new List<UserYoutube>();
             UserImages = new List<UserImage>();
+            UserSpotify = new List<UserSpotify>();
             
         }
 
@@ -100,6 +107,16 @@ public class Folder : Live.Core.Entity
         {
             this.LocLeft = left;
             this.LocTop = top;
+        }
+
+        public void ChangeTitle(string newTitle)
+        {
+
+            if(newTitle.Length > 200)
+            {
+                newTitle = newTitle.Substring(0, 100) + "...";
+            }
+            this.Title = newTitle;
         }
 
 }

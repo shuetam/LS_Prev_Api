@@ -14,13 +14,18 @@ namespace Live.Core.BookStores
         {
             var bookList = new List<Book>();
             string url = "https://livro.pl/bestsellery.html";
-            WebClient client = new WebClient();
+            WebClient client = new WebClient(){ Encoding = System.Text.Encoding.UTF8 };
             string htmlCode = "";
 
+        try {
             await Task.Run(() =>
             {
                 htmlCode = client.DownloadString(url);
             });
+        }
+        catch {
+            
+        }
 
             var htmlDoc = new HtmlDocument();
 
@@ -36,6 +41,8 @@ namespace Live.Core.BookStores
             var bestList = htmlDoc.DocumentNode.SelectNodes("//li[@class='item last']");
             //var bestList = htmlDoc.DocumentNode.SelectNodes("//div[@class='product-info']");
 
+        if(bestList != null)
+        {
             foreach (var book in bestList)
             {
                 try
@@ -59,14 +66,14 @@ namespace Live.Core.BookStores
                     var bookLivro = new Book(values[0].Trim(), values[1].Trim(), imgSrc.Trim(), "Livro");
                     await bookLivro.SetSizeAsync();
                     bookList.Add(bookLivro);
-
+                    Console.WriteLine(bookLivro.Title);
                 }
                 catch (Exception e)
                 {
 
                 }
             }
-
+        }
             //var images = bookList.Select(x => x.ImageSrc);
 
             //string imagess = "";

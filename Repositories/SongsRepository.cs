@@ -38,61 +38,103 @@ namespace Live.Repositories
 
       public async Task DeleteByYouTubeId(string id)
         {
-            var archiveSong = await GetByYouTubeFromArchive(id);
-            var actuallSong =  await GetByYouTubeFromActuall(id);
+            var archiveSongs = await GetByYouTubeFromArchive(id);
+            var actuallSongs =  await GetByYouTubeFromActuall(id);
 
-            if(archiveSong != null)
+            if(archiveSongs != null)
             {
-                _liveContext.ArchiveSongs.Remove(archiveSong);
+                _liveContext.ArchiveSongs.RemoveRange(archiveSongs);
             }
 
-            if(actuallSong != null)
+            if(actuallSongs.Count>0)
             {
-                _liveContext.Songs.Remove(actuallSong);
+                _liveContext.Songs.RemoveRange(actuallSongs);
             }
            await _liveContext.SaveChangesAsync();
         }
 
 /////////////CHANGE!! - FOR ALL IN ARCHIVE AND IN CURRENT SONGS!!------
-       public async Task ChangeYouTubeId(string Id, string toId)
+       public async Task ChangeYouTubeId(string name, string Id, string toId)
        {
-            var archiveSong = await GetByYouTubeFromArchive(Id);
-            var actuallSong =  await GetByYouTubeFromActuall(Id);
+            var actuallSongs =  await GetByNameFromActuall(name);
+            var archiveSongs = await GetByYouTubeFromArchive(Id);
 
-            if(actuallSong != null)
+            if(actuallSongs.Count>0)
             {
+                foreach(var actuallSong in actuallSongs)
+                {
                 actuallSong.ChangeYouTubeId(toId);
                 _liveContext.Update(actuallSong);
+
+                }
             }
-            if(archiveSong != null)
+
+            if(archiveSongs.Count>0)
+            {
+                foreach(var achiveSong in archiveSongs)
+                {
+                achiveSong.ChangeYouTubeId(toId);
+                _liveContext.Update(achiveSong);
+
+                }
+            }
+           /*  if(archiveSong != null)
             {
             archiveSong.ChangeYouTubeId(toId);
 
             _liveContext.Update(archiveSong);
-            }
+            } */
            await _liveContext.SaveChangesAsync();
        }
 
 
-        public async Task ChangeName(string Id, string name)
+    public async Task ChangeName(string Id, string name)
        {
-            var archiveSong = await GetByYouTubeFromArchive(Id);
-            var actuallSong =  await GetByYouTubeFromActuall(Id);
+            //var archiveSong = await GetByYouTubeFromArchive(Id);
+            var actuallSongs =  await GetByYouTubeFromActuall(Id);
 
-            if(actuallSong != null)
+            if(actuallSongs.Count>0)
             {
-                actuallSong.ChangeName(name);
-                _liveContext.Update(actuallSong);
+                foreach(var actuallSong in  actuallSongs)
+                {
+                    actuallSong.ChangeName(name);
+                    _liveContext.Update(actuallSong);
+                }
             }
-            if(archiveSong != null)
+         /*    if(archiveSong != null)
             {
             archiveSong.ChangeName(name);
-
-            _liveContext.Update(archiveSong);
-            }
+           _liveContext.Update(archiveSong);
+            } */
            await _liveContext.SaveChangesAsync();
        }
 
+
+    public async Task ChangeLocation(string Id, string left, string top)
+       {
+            var actuallSongs =  await GetByYouTubeFromActuall(Id);
+            var archiveSongs = await GetByYouTubeFromArchive(Id);
+
+            if(actuallSongs.Count>0)
+            {
+                foreach(var actuallSong in actuallSongs )
+                {
+                    actuallSong.ChangeLocation(left, top);
+                    _liveContext.Update(actuallSong);
+
+                }
+            }
+            if(archiveSongs.Count>0)
+            {
+                foreach(var archiveSong in archiveSongs )
+                {
+                    archiveSong.ChangeLocation(left, top);
+                    _liveContext.Update(archiveSong);
+                }
+            }
+ 
+           await _liveContext.SaveChangesAsync();
+       }
 
 
 
@@ -104,9 +146,19 @@ namespace Live.Repositories
         }
 
 
+        public async Task<List<IconDto>> GetAllErrorsFromArchive()
+        {
+            var archiveSongs = await _liveContext.ArchiveSongs.Include(x=>x.YouTube)
+            .ToListAsync();
+            var errors = archiveSongs.Where(x => x.YouTube.VideoID.Contains("Error") || x.YouTube.VideoID==x.Name);
+           return errors.Select(s =>  _autoMapper.Map<IconDto>(s)).ToList();
+        }
+
+
+
         public async Task<List<IconDto>> GetActualByRadioAsync(List<string> stations)
         {  
-            var date24 = DateTime.Now.AddHours(-24);
+            var date24 = DateTime.Now.AddHours(-12);
            var all_songs =  await _liveContext.Songs.Include(s => s.YouTube).Where(s => s.PlayAt>=date24).ToListAsync();
             //var all_songs =  await _liveContext.Songs.Include(s => s.YouTube).Where(s => s.PlayAt<date24).ToListAsync();
             
@@ -139,7 +191,7 @@ namespace Live.Repositories
 
         public async Task<List<IconDto>> GetActualRandomSongs()
         {  
-            var date24 = DateTime.Now.AddHours(-24);
+            var date24 = DateTime.Now.AddHours(-12);
             var all_songs =  await _liveContext.Songs.Include(s => s.YouTube).Where(s => s.PlayAt>=date24).ToListAsync();
             var songs = new List<Song>();
             var songsDto = new List<FrontYouTube>();
@@ -165,18 +217,19 @@ namespace Live.Repositories
           {
               Console.WriteLine($"{s.Name}  --- {s.Station}");
           }
-        
+        if(songs.Count>0)
+        {
+
           while(songs.Count != 0)
           {
               var song = songs[0];
               var songCount = songs.Where(s => s.YouTube.VideoID == song.YouTube.VideoID).ToList().Count;
 
-//if(!song.YouTube.VideoID.Contains("Error"))
-              // {
-                songs.RemoveAll(s => s.YouTube.VideoID == song.YouTube.VideoID);
-              // }
+            songs.RemoveAll(s => s.YouTube.VideoID == song.YouTube.VideoID);
+ 
               songsDto.Add(new FrontYouTube(song, songCount));
           }
+        }
 
           return songsDto.Select(x => _autoMapper.Map<IconDto>(x)).ToList();
 
@@ -189,21 +242,27 @@ namespace Live.Repositories
             return actuallSongs;
         } 
 
-        public async Task<ArchiveSong> GetByYouTubeFromArchive(string id)
+        public async Task<List<ArchiveSong>> GetByYouTubeFromArchive(string id)
         {
           var archiveSongs = await _liveContext.ArchiveSongs.Include(x=>x.YouTube).ToListAsync();
-          var song = archiveSongs.FirstOrDefault(s => s.YouTube.VideoID == id);
-          return song;
+          var songs = archiveSongs.Where(s => s.YouTube.VideoID == id).ToList();
+          return songs;
         }
 
-        public async Task<Song> GetByYouTubeFromActuall(string id)
+        public async Task<List<Song>> GetByYouTubeFromActuall(string id)
         {
-          var archiveSongs = await _liveContext.Songs.Include(x=>x.YouTube).ToListAsync();
-          var song = archiveSongs.FirstOrDefault(s => s.YouTube.VideoID == id);
-          return song;
+          var actualSongs = await _liveContext.Songs.Include(x=>x.YouTube).ToListAsync();
+          var songs = actualSongs.Where(s => s.YouTube.VideoID == id).ToList();
+          return songs;
         } 
 
 
+   public async Task<List<Song>> GetByNameFromActuall(string name)
+        {
+            var actuallSongs = await _liveContext.Songs.Include(x=>x.YouTube).ToListAsync();
+            var songs = actuallSongs.Where(s => s.Name == name).ToList();
+            return songs;
+        }
      
          public async Task<ArchiveSong> GetByNameFromArchive(string name)
         {
@@ -211,7 +270,7 @@ namespace Live.Repositories
 
            // var actuallSongs = await _liveContext.Songs.Include(x=>x.YouTube).ToListAsync();
             
-            var songArch = archiveSongs.SingleOrDefault(s => s.Name == name);
+            var songArch = archiveSongs.FirstOrDefault(s => s.Name == name);
             
             return songArch;
         }
@@ -231,7 +290,7 @@ namespace Live.Repositories
          // var stations = new Dictionary<int, string>(){{1,"zet"},{2,"rmf"},{3,"eska"},{4, "rmfmaxx"},
           // {5,"antyradio"},{6, "rmfclassic"},{8, "plus"},{9, "zloteprzeboje"},{30, "vox"},{40, "chillizet"}};
             
-             var stations = new Dictionary<int, string>(){{1,"zet"},{2,"rmf"},{3,"eska"},{4, "rmfmaxx"},{9, "zloteprzeboje"},{30, "vox"}};
+             var stations = new Dictionary<int, string>(){{1,"zet"},{2,"rmf"},{3,"eska"},{4, "rmfmaxx"},{9, "zloteprzeboje"},{30, "vox"},{48, "trojka"}};
             
     //  var stations = new Dictionary<int, string>(){{40, "chillizet"}, {30, "vox"},{9, "zloteprzeboje"}};
             
@@ -259,18 +318,18 @@ namespace Live.Repositories
 
                 int i = 0;
                 int h = 50;
-                if (hours>=24)
+                if (hours>=12)
                 {
-                    i = 24;
+                    i = 12;
                 
                 }
 
-                if(hourNow == dateLast.Hour && hours<24 )
+                if(hourNow == dateLast.Hour && hours<12 )
                 {
                     i = 0;
               
                 }
-                if(hourNow != dateLast.Hour && hours<24 )
+                if(hourNow != dateLast.Hour && hours<12 )
                 {
 
                     while(h != hourNow)
@@ -337,7 +396,7 @@ namespace Live.Repositories
                     {
                         toManyReq = true;
                     }
-                        await AddToArchiveAsync(song);
+                    await AddToArchiveAsync(song);
                 }
                 else
                 {
@@ -354,7 +413,7 @@ namespace Live.Repositories
            
         List<string> get_names_from_url(string url)
         {
-            WebClient client = new WebClient();
+            WebClient client = new WebClient() { Encoding = System.Text.Encoding.UTF8 };
             string htmlCode = client.DownloadString(url);
             List<string> names = new List<string>();
             string pattern = "class[=]{1}[\"]{1}title-link[\"]{1}[>]{1}([^\"]+)[<]{1}[/]{1}a[>]{1}";
