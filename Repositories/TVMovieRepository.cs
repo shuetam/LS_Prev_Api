@@ -10,6 +10,7 @@ using Microsoft.EntityFrameworkCore;
 using AutoMapper;
 using Live.Mapper;
 using HtmlAgilityPack;
+using Serilog;
 
 namespace Live.Repositories
 {
@@ -99,21 +100,6 @@ namespace Live.Repositories
 
             var allMovies = new List<TVMovie>();
 
-                // var date = System.DateTime.Now.AddDays(i);
-               // var day = date.ToString("yyyy-MM-dd");
-                //Console.WriteLine(day);
-
-                //https://www.telemagazyn.pl/?dzien=2019-10-09&gatunek=film&od=tv_puls#program
-
-               // string urlTele = $"https://www.telemagazyn.pl/?dzien={day}&gatunek=film";//#program";
-
-               // string urlTele1 = $"https://www.telemagazyn.pl/?dzien={day}&gatunek=film&od=tv_puls";//#program";
-
-               // Console.WriteLine(urlTele);
-               // Console.WriteLine(urlTele1);
-               // var movies = GetMoviesInfoFromUrl(urlTele, day);
-               // var movies1 = GetMoviesInfoFromUrl(urlTele1, day);
-
                for(int i=0;i<2;i++)
                {
 
@@ -127,18 +113,16 @@ namespace Live.Repositories
                     allMovies.AddRange(progMovies);
                 }
                }
+  
+    var moviesCount = allMovies.Count;
+    Log.Information($"TVMovies UPDATED with {moviesCount} movies");
+    foreach (var movie in allMovies)
+    {
 
-                //allMovies.AddRange(movies);
-               // allMovies.AddRange(movies1);
-            
- var moviesCount = allMovies.Count;
-            foreach (var movie in allMovies)
-            {
+        var exists = await  GetTheSameFromActual(movie);
 
-            var exists = await  GetTheSameFromActual(movie);
-
-if(exists is null)
-{
+        if(exists is null)
+        {
             Console.WriteLine(moviesCount);
 
             var archiveMovie = await GetByNameFromArchive(movie.TrailerSearch);
@@ -155,6 +139,7 @@ if(exists is null)
 
                     if (movie.YouTube.VideoID.Contains("FirstError"))
                     {
+                         Log.Warning("First ERROR from TVMovie Update");
                         toManyReq = true;
                     }
                     await AddToArchiveAsync(movie);
@@ -171,13 +156,16 @@ if(exists is null)
                 await _liveContext.TVMovies.AddAsync(movie);
                 await _liveContext.SaveChangesAsync();
                 moviesCount = moviesCount-1;
-            }
-           // _liveContext.TVMovies.RemoveRange(_liveContext.TVMovies.Where(x => x.PlayAt < DateTime.Now.AddHours(-2)));
         }
+           // _liveContext.TVMovies.RemoveRange(_liveContext.TVMovies.Where(x => x.PlayAt < DateTime.Now.AddHours(-2)));
+    }
               _liveContext.TVMovies.RemoveRange(_liveContext.TVMovies.Where(x => x.PlayAt < DateTime.Now.AddHours(-2)));
             await _liveContext.SaveChangesAsync();
-             Console.WriteLine("-----------------------FINISH UPDATE----------------------");
-    }
+
+        var errors = allMovies.Where(x => x.YouTube.VideoID.Contains("Error")).ToList();
+        Log.Information($"Finish TV movies update with {errors.Count} youtube errors");
+        Console.WriteLine("-----------------------FINISH UPDATE----------------------");
+}
 
             async Task<List<TVMovie>> GetMoviesForTvStationAsync(string url, string day)
             {
@@ -190,7 +178,15 @@ if(exists is null)
                     var movieUrl = url + programDay;
                     await Task.Run(() =>
                     {
-                        htmlCode = client.DownloadString(movieUrl); 
+                        try
+                        {
+                            htmlCode = client.DownloadString(movieUrl); 
+                        }
+                         catch(Exception ex)
+                        {
+                            Log.Error($"Exception DownloadString: {movieUrl}");
+                            Log.Error(ex.Message);
+                        }
                     });
 
                     var mainHTML = new HtmlDocument();
@@ -199,12 +195,8 @@ if(exists is null)
                         mainHTML.LoadHtml(htmlCode);
                     });
 
-                    //var moviesLi = mainHTML.DocumentNode.SelectNodes("//li[@class='filmy']");
-                    
                     var programList = mainHTML.DocumentNode.SelectSingleNode("//div[@class='lista']").InnerHtml;
                  
-
-
                     var statHTML = new HtmlDocument();
                         await Task.Run(() =>
                         {
@@ -255,6 +247,10 @@ if(exists is null)
                     {
                         Console.WriteLine("Something wrong in program --> " + url);
                         Console.WriteLine(ex.Message);
+
+                        Log.Error($"Something wrong with program: {url}");
+                        Log.Error(ex.Message);
+                        Log.Error(ex.StackTrace);
                     }
 
                     return movieList;

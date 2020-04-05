@@ -17,6 +17,7 @@ using System.Text.RegularExpressions;
 using System.Linq;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Serilog;
 
 namespace Live.Controllers
 {
@@ -35,6 +36,7 @@ namespace Live.Controllers
         [HttpGet("takemovies")]
         public async Task<IActionResult> TakeMovies()
         {
+           // Log.Information("Hello from movies");
              var movies = await _movieRepository.GetActuallMovies();
 
              return Json(movies);

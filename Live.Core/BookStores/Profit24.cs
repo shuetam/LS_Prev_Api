@@ -1,6 +1,7 @@
 using HtmlAgilityPack;
 using Live.Core;
 using Live.Core.BookStores;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,10 +22,18 @@ namespace Live.Live.Core.BookStores
             string htmlCode = "";
             client.Headers.Add("User-Agent: Other");
 
+        try {
+
             await Task.Run(() =>
             {
                 htmlCode = client.DownloadString(url);
             });
+            }
+            catch(Exception ex)
+            {
+                Log.Error($"Error in Profit24: {ex.Message}");
+                Log.Error(ex.StackTrace);
+            }
 
             var htmlDoc = new HtmlDocument();
 
@@ -62,10 +71,6 @@ namespace Live.Live.Core.BookStores
 
                     var src = "https://www.profit24.pl" + new Regex("[_]{2}t[_]{1}").Replace(srcImg, "__b_");
   
-                    //Console.WriteLine(title);
-                    //Console.WriteLine(author);
-                    //Console.WriteLine(src);
-
                     var book = new Book(title, author, src, "Profit24");
                     await book.SetSizeAsync();
                     bookList.Add(book);
@@ -74,6 +79,7 @@ namespace Live.Live.Core.BookStores
                 catch (Exception e)
                 {
                     Console.WriteLine(e.Message);
+                     Log.Error(e.StackTrace);
                 }
             }
         }

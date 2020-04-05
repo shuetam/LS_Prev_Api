@@ -9,6 +9,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using AutoMapper;
 using Live.Mapper;
+using Microsoft.Extensions.Logging;
+using Serilog;
 
 namespace Live.Repositories
 {
@@ -17,10 +19,15 @@ namespace Live.Repositories
         private readonly LiveContext _liveContext;
         private readonly IMapper _autoMapper;
 
-           public SongsRepository(LiveContext liveContext, IMapper autoMapper )
+     // private readonly ILogger _logger;
+
+
+        public SongsRepository(LiveContext liveContext, IMapper autoMapper)
         {
             this._liveContext = liveContext;
             this._autoMapper = autoMapper;
+       
+
         }
 
         public async Task<List<IconDto>> GetFromArchiveByIndex(int i, int j)
@@ -191,32 +198,36 @@ namespace Live.Repositories
 
         public async Task<List<IconDto>> GetActualRandomSongs()
         {  
-            var date24 = DateTime.Now.AddHours(-12);
-            var all_songs =  await _liveContext.Songs.Include(s => s.YouTube).Where(s => s.PlayAt>=date24).ToListAsync();
+            var date12 = DateTime.Now.AddHours(-12);
+            var allSongs =  await _liveContext.Songs.Include(s => s.YouTube).Where(s => s.PlayAt>=date12).ToListAsync();
             var songs = new List<Song>();
             var songsDto = new List<FrontYouTube>();
             Random random = new Random();
-           /*  var stations = new Dictionary<int, string>(){{1,"zet"},{2,"rmf"},{3,"eska"},{4, "rmfmaxx"},
-           {5,"antyradio"},{6, "rmfclassic"},{8, "plus"},{9, "zloteprzeboje"},{30, "vox"},{40, "chillizet"}};
- */
-        var stations = new Dictionary<int, string>(){{1,"zet"},{2,"rmf"},{3,"eska"},{4, "rmfmaxx"},{9, "zloteprzeboje"},{30, "vox"}};
-            
+ 
+        var stations = new Dictionary<int, string>(){{1,"zet"},{2,"rmf"},{3,"eska"},{4, "rmfmaxx"},{9, "zloteprzeboje"},{30, "vox"},{48, "trojka"}};
+
+        var arrayLog  = songsDto.ToArray();
+       
+
+        if(allSongs.Count>0) 
+        {
+
           foreach(var radio in stations)
           {
-            for(int i = 0;i<10;i++)
-            {
-            
-            var randomSong = all_songs.Where(s => s.Station == radio.Value).ToList()[random.Next(all_songs.Where(s => s.Station == radio.Value).ToList().Count)];
-            all_songs.RemoveAll(s=>s.YouTube.VideoID == randomSong.YouTube.VideoID);
-            songs.Add(randomSong);
+            var radioSongs = allSongs.Where(s => s.Station == radio.Value).ToList();
 
+            if(radioSongs.Count>11)
+            {
+                while(radioSongs.Count > 11)
+                {
+                    var index = random.Next(0, radioSongs.Count-1);
+                    radioSongs.RemoveAt(index);
+                }
             }
+            songs.AddRange(radioSongs);   
           }
-        
-          foreach(var s in songs)
-          {
-              Console.WriteLine($"{s.Name}  --- {s.Station}");
-          }
+        }  
+
         if(songs.Count>0)
         {
 
@@ -224,9 +235,7 @@ namespace Live.Repositories
           {
               var song = songs[0];
               var songCount = songs.Where(s => s.YouTube.VideoID == song.YouTube.VideoID).ToList().Count;
-
             songs.RemoveAll(s => s.YouTube.VideoID == song.YouTube.VideoID);
- 
               songsDto.Add(new FrontYouTube(song, songCount));
           }
         }
@@ -287,26 +296,9 @@ namespace Live.Repositories
     public async Task UpdateAsync()
     {
 
-         // var stations = new Dictionary<int, string>(){{1,"zet"},{2,"rmf"},{3,"eska"},{4, "rmfmaxx"},
-          // {5,"antyradio"},{6, "rmfclassic"},{8, "plus"},{9, "zloteprzeboje"},{30, "vox"},{40, "chillizet"}};
-            
-             var stations = new Dictionary<int, string>(){{1,"zet"},{2,"rmf"},{3,"eska"},{4, "rmfmaxx"},{9, "zloteprzeboje"},{30, "vox"},{48, "trojka"}};
-            
-    //  var stations = new Dictionary<int, string>(){{40, "chillizet"}, {30, "vox"},{9, "zloteprzeboje"}};
-            
-            
+            var stations = new Dictionary<int, string>(){{1,"zet"},{2,"rmf"},{3,"eska"},{4, "rmfmaxx"},{9, "zloteprzeboje"},{30, "vox"},{48, "trojka"}};
            var dateLast = await GetLastDate();
-
-      //    Console.WriteLine("last date - " + await GetLastDate());
-
-  //   DateTime dateLast = DateTime.ParseExact(
-    //     "2019-03-18 21:06", "yyyy-MM-dd HH:mm", 
-    //    System.Globalization.CultureInfo.InvariantCulture); 
-
                 Console.WriteLine(dateLast);
-
-
-
                 var dateNow = DateTime.Now;
                 int hourNow = dateNow.Hour;
                 Console.WriteLine(dateNow );
@@ -357,7 +349,7 @@ namespace Live.Repositories
                 {
                     string addres = "https://www.odsluchane.eu/szukaj.php?r="+s+"&date="+date+"&time_from="+hourFrom+"&time_to="+hourTo;
                     Console.WriteLine(addres);
-                  var names = get_names_from_url(addres);
+                  var names = getNamesFromUrl(addres);
                 
                 if(names.Count>0)
                 {
@@ -369,6 +361,8 @@ namespace Live.Repositories
                 }
 
                 }
+
+ Log.Information($"Radio Songs UPDATED with {listOfInitialSongs.Count} songs");
 
             if(listOfInitialSongs.Count>0)
             {
@@ -394,6 +388,7 @@ namespace Live.Repositories
 
                     if (song.YouTube.VideoID.Contains("FirstError"))
                     {
+                        Log.Warning("First ERROR from Song Update");
                         toManyReq = true;
                     }
                     await AddToArchiveAsync(song);
@@ -409,12 +404,26 @@ namespace Live.Repositories
                 }
                 await _liveContext.SaveChangesAsync();
             }
+
+        var errors = listOfInitialSongs.Where(x => x.YouTube.VideoID.Contains("Error")).ToList();
+        Log.Information($"Finish radio songs update with {errors.Count} youtube errors");
+        
         Console.WriteLine("-----------------------FINISH UPDATE----------------------");
            
-        List<string> get_names_from_url(string url)
+        List<string> getNamesFromUrl(string url)
         {
             WebClient client = new WebClient() { Encoding = System.Text.Encoding.UTF8 };
-            string htmlCode = client.DownloadString(url);
+            string htmlCode = "";
+            try 
+            {
+            htmlCode = client.DownloadString(url);
+            }
+            catch(Exception ex)
+            {
+                Log.Error($"Exception DownloadString: {url}");
+                Log.Error(ex.Message);
+            }
+
             List<string> names = new List<string>();
             string pattern = "class[=]{1}[\"]{1}title-link[\"]{1}[>]{1}([^\"]+)[<]{1}[/]{1}a[>]{1}";
             var reg1 = new Regex(pattern);

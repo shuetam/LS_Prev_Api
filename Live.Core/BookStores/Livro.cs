@@ -5,6 +5,7 @@ using System.Net;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using HtmlAgilityPack;
+using Serilog;
 
 namespace Live.Core.BookStores
 {
@@ -23,10 +24,12 @@ namespace Live.Core.BookStores
                 htmlCode = client.DownloadString(url);
             });
         }
-        catch {
-            
+        catch(Exception ex) {
+            Log.Error($"Error in Livro: {ex.Message}");
+            Log.Error(ex.StackTrace);
         }
-
+ if(!string.IsNullOrEmpty(htmlCode))
+    {
             var htmlDoc = new HtmlDocument();
 
             await Task.Run(() =>
@@ -34,10 +37,6 @@ namespace Live.Core.BookStores
                 htmlDoc.LoadHtml(htmlCode);
             });
 
-
-
-            //Console.WriteLine(table.OuterHtml);
-            // li class="item last"
             var bestList = htmlDoc.DocumentNode.SelectNodes("//li[@class='item last']");
             //var bestList = htmlDoc.DocumentNode.SelectNodes("//div[@class='product-info']");
 
@@ -70,7 +69,7 @@ namespace Live.Core.BookStores
                 }
                 catch (Exception e)
                 {
-
+                    Log.Error(e.StackTrace);
                 }
             }
         }
@@ -81,7 +80,7 @@ namespace Live.Core.BookStores
             //{
             //    imagess += (img + Environment.NewLine);
             //}
-
+    }
             return bookList;
 
         }

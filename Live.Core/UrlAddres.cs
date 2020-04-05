@@ -46,10 +46,6 @@ namespace Live.Core
                 }
 
                 }
-                
-            
-
-
         }
     }
 }

@@ -1,0 +1,3 @@
+2020-04-03 00:40:01.510 +02:00 [Information] Hello, from random songs!!
+2020-04-03 00:43:16.724 +02:00 [Information] Hello, from random songs!!
+2020-04-03 00:48:05.647 +02:00 [Information] Hello, from random songs!!

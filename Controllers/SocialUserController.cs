@@ -15,6 +15,7 @@ using System.Net;
 using System.IO;
 using System.Text.RegularExpressions;
 using System.Security.Claims;
+using Serilog;
 
 namespace Live.Controllers
 {
@@ -81,12 +82,14 @@ namespace Live.Controllers
                 catch (Exception e)
                 {
                     Console.WriteLine(e.Message);
+                    Log.Error($"Google login Error: {e.Message}");
+                    Log.Error(e.StackTrace);
                     return Json(error);
                 }
                 }
                 if(facebookReg.IsMatch(socialLogin.Token))
                 {
-                    Console.WriteLine("Facebook!");
+                    //Console.WriteLine("Facebook!");
                 ///implement facebook auth and login
                     string facebookToken = facebookReg.Replace(socialLogin.Token, "");
                     string url = "https://graph.facebook.com/me?access_token=" + facebookToken;
@@ -101,6 +104,8 @@ namespace Live.Controllers
                     catch(Exception e)
                     {
                         Console.WriteLine(e.Message);
+                        Log.Error($"Facebook login Error: {e.Message}");
+                        Log.Error(e.StackTrace);
                         return Json(error);
                     }
 

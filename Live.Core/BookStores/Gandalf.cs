@@ -1,4 +1,5 @@
 ﻿using HtmlAgilityPack;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,10 +24,13 @@ namespace Live.Core.BookStores
                 htmlCode = client.DownloadString(url);
             });
         }
-        catch {
-
+        catch (Exception ex) {
+            Log.Error($"Error in Gandalf: {ex.Message}");
+            Log.Error(ex.StackTrace);
         }
 
+  if(!string.IsNullOrEmpty(htmlCode))
+    {
             var htmlDoc = new HtmlDocument();
 
             await Task.Run(() =>
@@ -72,11 +76,11 @@ if(bestList != null)
                 }
                 catch (Exception e)
                 {
-
+                    Log.Error(e.StackTrace);
                 }
             }
-}
-
+        }
+    }
             return bookList;
         }
     }

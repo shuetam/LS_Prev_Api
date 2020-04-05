@@ -106,20 +106,13 @@ namespace Live.Controllers
              return Json(youTube.youTubeId);
         }
 
-     /*    [HttpPut("change/{Id}/{toId}")]
-        public async Task <IActionResult> ChangeYouTubeId(string Id, string toId)
-        {
-             await _songRepository.ChangeYouTubeId(Id, toId);
-             return NoContent();
-        } */
-
         [HttpPost("changename/{Id}")]
         public async Task <IActionResult> ChangeName(string Id, [FromBody] NameSetter Name)
         {
              await _songRepository.ChangeName(Id, Name.name);
              return NoContent();
         }
-//
+
         [HttpPost("allradiosongs/{stations}")]
         public async Task <IActionResult> GetAllActualSongs(string stations)
         {

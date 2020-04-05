@@ -30,17 +30,8 @@ namespace Live.Repositories
         
             if(exist == null)
             {
-                //var top = GetLocationAsync(addYoutube.UserId).Result;
-                //var existYT = _liveContext.YouTubes.FirstOrDefault(x => x.VideoID == addYoutube.Id);
                 var newYoutube = new UserYoutube(userId, addYoutube.Id, addYoutube.Title, addYoutube.Left, addYoutube.Top, addYoutube.FolderId);
-                //var idu = new Guid( addYoutube.UserId);
-                //var user = _liveContext.Users.FirstOrDefault(x => x.ID == idu);
-                //user.UserYoutubes.Add(newYoutube);
-                //_liveContext.Update(user);
-            
-                //Console.WriteLine($"user has YT: {user.UserYoutubes.Count}");
-              
-            
+           
                 _liveContext.UserYoutubes.Add(newYoutube);
                 await _liveContext.SaveChangesAsync();
                 return true;

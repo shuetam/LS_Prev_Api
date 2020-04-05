@@ -23,6 +23,7 @@ using Live.Services;
 using Newtonsoft.Json.Serialization;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.Authorization;
+using Microsoft.Extensions.Logging.Debug;
 
 namespace Live
 {
@@ -43,6 +44,23 @@ namespace Live
             var sql_connection = new SqlConnectingSettings(connectionString);
 
             services.AddMvcCore();
+
+            services.AddLogging(builder =>
+            {
+                //builder.AddConfiguration(Configuration.GetSection("Logging"));
+                
+                   /*  builder.AddFile("Logs/myapp-{Date}.txt")
+                    .AddFilter("Microsoft", LogLevel.Warning)
+                    .AddFilter("System", LogLevel.Warning)
+                    .AddFilter("Live.Controllers", LogLevel.Information); */
+               
+                   /*  builder.AddFilter("System", LogLevel.Information);
+                    builder.AddFilter("Microsoft", LogLevel.Information);
+                    builder.AddFilter<DebugLoggerProvider>("System", LogLevel.Information);
+                    builder.AddFilter<DebugLoggerProvider>("Microsoft", LogLevel.Information); */
+
+                    
+            });
 
             services.AddMvc().AddJsonOptions(j => j.SerializerSettings.ReferenceLoopHandling
             = Newtonsoft.Json.ReferenceLoopHandling.Ignore);

@@ -1,4 +1,5 @@
 using HtmlAgilityPack;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -38,8 +39,8 @@ namespace Live.Core.BookStores
 
             var bestList = htmlDoc.DocumentNode.SelectNodes("//tr");
 
-if(bestList != null)
-{
+    if(bestList != null)
+    {
             foreach (var bestNode in bestList)
             {
                 try
@@ -60,17 +61,13 @@ if(bestList != null)
 
                     using (WebClient client1 = new WebClient())
                     {
-                        var htmlData = client.DownloadData(urlAddress);
+                        var htmlData = client1.DownloadData(urlAddress);
                         htmlBook = Encoding.UTF8.GetString(htmlData);
                     }
 
-/*                         await Task.Run(() =>
-                        {
-                            htmlBook = clientBook.DownloadString(urlAddress);
-                        }); */
 
-Console.WriteLine(htmlBook);
-Console.WriteLine("===============================================================");
+                    Console.WriteLine(htmlBook);
+                    Console.WriteLine("===============================================================");
                         var htmlDocBook = new HtmlDocument();
                       
                         htmlDocBook.LoadHtml(htmlBook);
@@ -98,22 +95,15 @@ Console.WriteLine("=============================================================
                     //Console.WriteLine(book.Title);
 
                     }
-
-                    //  var parent = bestNode.ParentNode.ParentNode.ParentNode.ParentNode.ParentNode.ParentNode.InnerHtml.Trim();
-                    //        var htmlParent = new HtmlDocument();
-                    //        htmlParent.LoadHtml(parent);
-                    //        var img = "https:" + htmlParent.DocumentNode.SelectSingleNode("//img").Attributes["src"].Value;
-                    //        var author = htmlParent.DocumentNode.SelectNodes("//a").FirstOrDefault(x => x.Attributes["title"].Value.Contains("autora")).InnerText.Trim();
-
-                    //        bookList.Add(new Book(title, author, img, "Bonito"));
-                    //        var tt = "";
                 }
                 catch (Exception e)
                 {
+                    Log.Error($"Exception in Aros: {e.Message}");
+                    Log.Error(e.StackTrace);
 
                 }
             }
-}
+    }
 
             return bookList;
         }

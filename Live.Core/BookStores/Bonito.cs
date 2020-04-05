@@ -1,4 +1,5 @@
 using HtmlAgilityPack;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,9 +24,15 @@ namespace Live.Core.BookStores
                 htmlCode = client.DownloadString(url);
             });
             }
-            catch{
-                
+            catch (Exception ex)
+            {
+                    Log.Error($"Exception in Bonito: {ex.Message}");
+                    Log.Error(ex.StackTrace);
             }
+
+    if(!string.IsNullOrEmpty(htmlCode))
+    {
+
             var htmlDoc = new HtmlDocument();
             Console.WriteLine(htmlCode);
             Console.WriteLine("=======================================================");
@@ -37,8 +44,8 @@ namespace Live.Core.BookStores
             var bestListParents = htmlDoc.DocumentNode.SelectNodes("//tr").Where(x => x.OuterHtml.Contains("<h2")).ToList();
             var bestList = htmlDoc.DocumentNode.SelectNodes("//h2");
 
-if(bestList != null)
-{
+        if(bestList != null)
+        {
             foreach (var bestNode in bestList)
             {
                 try
@@ -60,6 +67,7 @@ if(bestList != null)
 
                 }
             }
+    }
 
 }
             return bookList;

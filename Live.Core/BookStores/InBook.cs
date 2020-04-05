@@ -1,6 +1,7 @@
 using HtmlAgilityPack;
 using Live.Core;
 using Live.Core.BookStores;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -27,10 +28,13 @@ namespace Live.Live.Core.BookStores
                 htmlCode = client.DownloadString(url);
             });
             }
-            catch{
-                
+            catch (Exception ex){
+                Log.Error($"Error in InBook: {ex.Message}");
+                Log.Error(ex.StackTrace);
             }
 
+ if(!string.IsNullOrEmpty(htmlCode))
+    {
             var htmlDoc = new HtmlDocument();
 
             await Task.Run(() =>
@@ -58,21 +62,16 @@ if(bestBooks != null)
 
                     var imgSrc = docHtml.DocumentNode.SelectSingleNode("//img").Attributes["src"].Value;
                     
-                    //Console.WriteLine(titleWithAuthor);
-                    //Console.WriteLine(imgSrc);
-                    //Console.WriteLine(src);
-
-                    //var book = new Book(title, author, src, "Profit24");
-                    //await book.SetSizeAsync();
-                    //bookList.Add(book);
 
                 }
                 catch (Exception e)
                 {
                     Console.WriteLine(e.Message);
+                    Log.Error(e.StackTrace);
                 }
             }
-}
+        }
+    }
 
             return bookList;
         }

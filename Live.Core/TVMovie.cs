@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.IO;
 using HtmlAgilityPack;
 using System.Globalization;
+using Serilog;
 
 namespace Live.Core
 {
@@ -101,7 +102,18 @@ namespace Live.Core
             public string getFilwebRating()
             {
                 WebClient client = new WebClient();
-                string htmlCode = client.DownloadString("https://www.filmweb.pl/search?q=" + this.TrailerSearch);
+                string htmlCode = "";
+
+                try 
+                {
+                htmlCode = client.DownloadString("https://www.filmweb.pl/search?q=" + this.TrailerSearch);
+                }
+                catch(Exception ex)
+                {
+                    Log.Error($"Error with DownloadString in getFilwebRating: {this.TrailerSearch}");
+                    Log.Error(ex.Message);
+                }
+
            
                 List<string> names = new List<string>();
 

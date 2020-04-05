@@ -18,8 +18,7 @@ using System.Linq;
 using System.Collections.Generic;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-
-
+using Serilog;
 
 namespace Live.Controllers
 {
@@ -80,6 +79,7 @@ namespace Live.Controllers
         public async Task<IActionResult> GetIcons([FromBody] AuthUser user)
         {
           var icons = await _desktopRepository.GetAllIconsForUserAsync(this.UserId, user.folderId);
+          Log.Information("Getting icons for user");
           return Json(icons);
         }
 
@@ -87,6 +87,7 @@ namespace Live.Controllers
         public async Task<IActionResult> GetImages([FromBody] AuthUser user)
         {
           var icons = await _desktopRepository.GetAllImagesForUserAsync(this.UserId, user.folderId);
+             Log.Information("Getting images for user");
           return Json(icons);
         }
 
@@ -94,6 +95,7 @@ namespace Live.Controllers
         public async Task<IActionResult> GetSpotify([FromBody] AuthUser user)
         {
           var icons = await _desktopRepository.GetAllSpotifyForUserAsync(this.UserId, user.folderId);
+            Log.Information("Getting spotify for user");
           return Json(icons);
         }
 

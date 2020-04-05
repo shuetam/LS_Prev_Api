@@ -12,6 +12,8 @@ using Newtonsoft.Json.Linq;
 using Live.Core;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.Extensions.Logging;
+using Serilog;
 
 namespace Live.Controllers
 {
@@ -22,10 +24,15 @@ namespace Live.Controllers
     public class SongController : LiveController
     {
         private readonly  ISongsRepository _songRepository;
+
+        //private readonly ILogger _logger;
         
         public SongController (ISongsRepository songRepository)
         {
             this._songRepository = songRepository;
+           // _logger = logger;
+
+       
         }
 
 /*         [HttpPost("editsong")]
@@ -95,7 +102,11 @@ namespace Live.Controllers
         [HttpGet("radiorandom")]
         public async Task <IActionResult> GetAllRandomSongs()
         {
-        
+            //Log.Information("Hello, from random songs!!");
+        /* _logger.LogInformation("RANDOMMM INFORMATION");
+         _logger.LogCritical("RANDOMMM CRITICAL");
+         _logger.LogError("RANDOMMM ERROR");
+          _logger.LogWarning("RANDOMMM WARNING"); */
             var songs = await _songRepository.GetActualRandomSongs();
             return Json(songs);
         }

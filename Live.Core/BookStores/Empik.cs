@@ -1,6 +1,7 @@
 ﻿using HtmlAgilityPack;
 using Live.Core;
 using Live.Core.BookStores;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -28,9 +29,13 @@ namespace Live.Live.Core.BookStores
                 htmlCode = client.DownloadString(url);
             });
             }
-        catch {
-
+        catch (Exception ex) {
+            Log.Error($"Error in Empik: {ex.Message}");
+            Log.Error(ex.StackTrace);
         }
+
+    if(!string.IsNullOrEmpty(htmlCode))
+    {
 
             var htmlDoc = new HtmlDocument();
 
@@ -72,10 +77,11 @@ namespace Live.Live.Core.BookStores
                 }
                 catch (Exception e)
                 {
-
+                    Log.Error(e.StackTrace);
                 }
             }
         }
+    }
 
             return bookList;
         }
