@@ -81,8 +81,8 @@ namespace Live.Core
             }
             public void  CorrectName(ArchiveSong songFromDatabse)
             {
-                Console.WriteLine("---------------------CORRECT  NAME------------------------");
-                Console.WriteLine($"FROM  ///{this.Name}///  TO  ///{songFromDatabse.Name}///");
+                //Console.WriteLine("---------------------CORRECT  NAME------------------------");
+                //Console.WriteLine($"FROM  ///{this.Name}///  TO  ///{songFromDatabse.Name}///");
                 this.Name = songFromDatabse.Name;
             }
 

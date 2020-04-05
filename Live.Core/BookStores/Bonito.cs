@@ -34,8 +34,8 @@ namespace Live.Core.BookStores
     {
 
             var htmlDoc = new HtmlDocument();
-            Console.WriteLine(htmlCode);
-            Console.WriteLine("=======================================================");
+            //Console.WriteLine(htmlCode);
+            //Console.WriteLine("=======================================================");
             await Task.Run(() =>
             {
                 htmlDoc.LoadHtml(htmlCode);
@@ -64,6 +64,8 @@ namespace Live.Core.BookStores
                 }
                 catch (Exception e)
                 {
+                    Log.Error($"Bonito inner error: {e.Message}");
+                     Log.Error(e.StackTrace);
 
                 }
             }

@@ -34,8 +34,8 @@ namespace Live.Controllers
         public async Task<IActionResult> GetBestsellers()
         {
             var books = await _bookRepository.GetActuallBestsellersAsync();
-            Console.WriteLine("------------getting books---------------");
-            Console.WriteLine(books[0].title);
+            //Console.WriteLine("------------getting books---------------");
+            //Console.WriteLine(books[0].title);
             return Json(books);
         }
 

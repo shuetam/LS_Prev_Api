@@ -34,7 +34,7 @@ namespace Live.Core
         {
             this.set_location();
             this.VideoID = "Error"+this.top;
-            Console.WriteLine($"{Name} - to many reqests.");
+            //Console.WriteLine($"{Name} - to many reqests.");
         }
 
          public YouTube(RadioSong radio_song)
@@ -98,11 +98,11 @@ namespace Live.Core
             response.Close();
             }
             catch(WebException e)
-            {   Console.WriteLine("+++++++++++++++++++++++++++++++++++++++++++++++");
-                Console.WriteLine(e.Message);
-                Console.WriteLine("+++++++++++++++++++++++++++++++++++++++++++++++");
+            {   //Console.WriteLine("+++++++++++++++++++++++++++++++++++++++++++++++");
+                //Console.WriteLine(e.Message);
+                //Console.WriteLine("+++++++++++++++++++++++++++++++++++++++++++++++");
                 this.VideoID = "FirstError" + this.top;
-                Console.WriteLine(this.VideoID);
+                //Console.WriteLine(this.VideoID);
                 //Console.WriteLine("+++++++++++++++++++++++++++++++++++++++++++++++");
             }
 
@@ -117,8 +117,8 @@ namespace Live.Core
         string ID = reg.Matches(json).Select(s => s.Groups[1].Value).ToArray()[0];
         this.VideoID = ID;
      //   Console.WriteLine("--------------F R O M   A P I-----------------");
-        Console.WriteLine(name);
-        Console.WriteLine(ID);
+        //Console.WriteLine(name);
+        //Console.WriteLine(ID);
         }
     
 
@@ -163,7 +163,7 @@ namespace Live.Core
             Random rnd = new Random();
             int sek = rnd.Next(2000, 5000);
         //  Console.WriteLine("----------------F R O M   H T T P-----------------------");
-          Console.WriteLine(name + " - from youtube");
+          //Console.WriteLine(name + " - from youtube");
         //  Console.WriteLine(ID);
         //  Console.WriteLine("Sleep--- " + sek);
             System.Threading.Thread.Sleep(sek);

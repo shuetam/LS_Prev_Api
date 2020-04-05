@@ -19,13 +19,22 @@ namespace Live.Core.BookStores
             WebClient client = new WebClient(){ Encoding = System.Text.Encoding.UTF8 };
             string htmlCode = "";
 
+        try{
             await Task.Run(() =>
             {
                 htmlCode = client.DownloadString(url);
             });
+        }
+        catch(Exception ex)
+        {
+            Log.Error($"Eror in Aros: {ex.Message}");
+            Log.Error(ex.StackTrace);
+        }
 
             var htmlDoc = new HtmlDocument();
 
+if(!string.IsNullOrEmpty(htmlCode))
+{
             await Task.Run(() =>
             {
                 htmlDoc.LoadHtml(htmlCode);
@@ -66,8 +75,8 @@ namespace Live.Core.BookStores
                     }
 
 
-                    Console.WriteLine(htmlBook);
-                    Console.WriteLine("===============================================================");
+                    //Console.WriteLine(htmlBook);
+                    //Console.WriteLine("===============================================================");
                         var htmlDocBook = new HtmlDocument();
                       
                         htmlDocBook.LoadHtml(htmlBook);
@@ -104,6 +113,7 @@ namespace Live.Core.BookStores
                 }
             }
     }
+}
 
             return bookList;
         }

@@ -65,7 +65,7 @@ namespace Live.Core.BookStores
                     var bookLivro = new Book(values[0].Trim(), values[1].Trim(), imgSrc.Trim(), "Livro");
                     await bookLivro.SetSizeAsync();
                     bookList.Add(bookLivro);
-                    Console.WriteLine(bookLivro.Title);
+                    //Console.WriteLine(bookLivro.Title);
                 }
                 catch (Exception e)
                 {

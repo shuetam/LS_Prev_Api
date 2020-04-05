@@ -37,7 +37,7 @@ namespace Live.Repositories
 
             if(user == null)
             {
-                Console.WriteLine("Save user to database");
+                //Console.WriteLine("Save user to database");
                 User newUser = new User(userId, name, email, authType, "USER");
                 await _liveContext.AddAsync(newUser);
                 await _liveContext.SaveChangesAsync();

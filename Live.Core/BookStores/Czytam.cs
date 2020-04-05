@@ -75,7 +75,7 @@ if(!string.IsNullOrEmpty(htmlCode))
                     var book = new Book(title, author, img, "Czytam");
                     await book.SetSizeAsync();
                     bookList.Add(book);
-                Console.WriteLine(book.Title);
+                //Console.WriteLine(book.Title);
             }
             }
     }

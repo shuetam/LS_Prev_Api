@@ -169,10 +169,7 @@ namespace Live.Repositories
            var all_songs =  await _liveContext.Songs.Include(s => s.YouTube).Where(s => s.PlayAt>=date24).ToListAsync();
             //var all_songs =  await _liveContext.Songs.Include(s => s.YouTube).Where(s => s.PlayAt<date24).ToListAsync();
             
-            foreach(var s in all_songs)
-            {
-                Console.WriteLine(s.Name);
-            }
+
 
             var songs = new List<Song>();
             var ytFront = new List<FrontYouTube>();
@@ -188,7 +185,7 @@ namespace Live.Repositories
               var songCount = songs.Where(s => s.YouTube.VideoID == song.YouTube.VideoID).ToList().Count;
               songs.RemoveAll(s => s.YouTube.VideoID == song.YouTube.VideoID);
               ytFront.Add(new FrontYouTube(song, songCount));
-              Console.WriteLine(song.Name);
+              //Console.WriteLine(song.Name);
           }
 
           return ytFront.Select(x => _autoMapper.Map<IconDto>(x)).ToList();
@@ -298,10 +295,10 @@ namespace Live.Repositories
 
             var stations = new Dictionary<int, string>(){{1,"zet"},{2,"rmf"},{3,"eska"},{4, "rmfmaxx"},{9, "zloteprzeboje"},{30, "vox"},{48, "trojka"}};
            var dateLast = await GetLastDate();
-                Console.WriteLine(dateLast);
+                //Console.WriteLine(dateLast);
                 var dateNow = DateTime.Now;
                 int hourNow = dateNow.Hour;
-                Console.WriteLine(dateNow );
+                //Console.WriteLine(dateNow );
 
                 var hours = (dateNow - dateLast).TotalHours;
 
@@ -348,7 +345,7 @@ namespace Live.Repositories
                 foreach(var s in stations.Keys)
                 {
                     string addres = "https://www.odsluchane.eu/szukaj.php?r="+s+"&date="+date+"&time_from="+hourFrom+"&time_to="+hourTo;
-                    Console.WriteLine(addres);
+                    //Console.WriteLine(addres);
                   var names = getNamesFromUrl(addres);
                 
                 if(names.Count>0)
@@ -371,7 +368,7 @@ namespace Live.Repositories
                 foreach(var song in listOfInitialSongs)
                 {   
                     
-                    Console.WriteLine(songsCount);
+                    //Console.WriteLine(songsCount);
                     
                     var archiveSong = await GetByNameFromArchive(song.Name);
 

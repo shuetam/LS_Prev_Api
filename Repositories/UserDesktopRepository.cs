@@ -58,7 +58,7 @@ namespace Live.Repositories
 
         public async Task<List<IconDto>> GetAllIconsForUserAsync(Guid userId, string folderId)
         {
-            Console.WriteLine(userId + "      -       " + folderId);
+            //Console.WriteLine(userId + "      -       " + folderId);
             var yotubes = 
             string.IsNullOrEmpty(folderId)?       
             await _liveContext.UserYoutubes.Where(x => x.UserId == userId && x.FolderId==null ).ToListAsync()
@@ -67,13 +67,13 @@ namespace Live.Repositories
             
             var icons = yotubes.Select(x => _autoMapper.Map<IconDto>(x)).ToList();
          
-            Console.WriteLine("Getting icons");
+            //Console.WriteLine("Getting icons");
             return icons;
         }
 
         public async Task<List<IconDto>> GetAllImagesForUserAsync(Guid userId, string folderId)
         {
-            Console.WriteLine(userId + "      -       " + folderId);
+            //Console.WriteLine(userId + "      -       " + folderId);
             var images = 
             string.IsNullOrEmpty(folderId)?       
             await _liveContext.UserImages.Where(x => x.UserId == userId && x.FolderId==null ).ToListAsync()
@@ -82,13 +82,13 @@ namespace Live.Repositories
             
             var icons = images.Select(x => _autoMapper.Map<IconDto>(x)).ToList();
          
-            Console.WriteLine("Getting images");
+           // Console.WriteLine("Getting images");
             return icons;
         }
 
         public async Task<List<IconDto>> GetAllSpotifyForUserAsync(Guid userId, string folderId)
         {
-            Console.WriteLine(userId + "      -       " + folderId);
+            //Console.WriteLine(userId + "      -       " + folderId);
             var spotifies = 
             string.IsNullOrEmpty(folderId)?       
             await _liveContext.UserSpotify.Where(x => x.UserId == userId && x.FolderId==null ).ToListAsync()
@@ -97,7 +97,7 @@ namespace Live.Repositories
             
             var icons = spotifies.Select(x => _autoMapper.Map<IconDto>(x)).ToList();
          
-            Console.WriteLine("Getting spotifies");
+            //Console.WriteLine("Getting spotifies");
             return icons;
         }
 
@@ -127,43 +127,43 @@ namespace Live.Repositories
             }
             var icons = folders.Select(x => _autoMapper.Map<FolderDto>(x)).ToList();
             //icons.AddRange(folders.Select(x => _autoMapper.Map<IconDto>(x)).ToList());
-            Console.WriteLine("Getting folders");
+            //Console.WriteLine("Getting folders");
             return icons;
         }
 
         public async Task RemoveEntity(Guid userId, string entityId, string entityType)
         {
-              Console.WriteLine(entityType);
+              //Console.WriteLine(entityType);
             if(entityType == "YT")
             {
-                Console.WriteLine("i am removing entity");
+                //Console.WriteLine("i am removing entity");
                var entity = _liveContext.UserYoutubes.FirstOrDefault(x => x.UserId == userId && x.VideoId == entityId);
-                Console.WriteLine(entity.ID);
+                //Console.WriteLine(entity.ID);
                 _liveContext.Remove(entity);
                await _liveContext.SaveChangesAsync();
             }
 
             if(entityType == "SPOTIFY")
             {
-                Console.WriteLine("i am removing entity");
+                //Console.WriteLine("i am removing entity");
                var entity = _liveContext.UserSpotify.FirstOrDefault(x => x.UserId == userId && x.SpotifyId == entityId);
-                Console.WriteLine(entity.ID);
+                //Console.WriteLine(entity.ID);
                 _liveContext.Remove(entity);
                await _liveContext.SaveChangesAsync();
             }
 
         if(entityType == "IMG" || entityType == "BOOK" )
             {
-                Console.WriteLine("i am removing IMAGE");
+                //Console.WriteLine("i am removing IMAGE");
                var entity = _liveContext.UserImages.FirstOrDefault(x => x.UserId == userId && x.UrlAddress == entityId);
-                Console.WriteLine(entity.ID);
+                //Console.WriteLine(entity.ID);
                 _liveContext.Remove(entity);
                await _liveContext.SaveChangesAsync();
             }
 
         if(entityType == "FOLDER")
             {
-                Console.WriteLine("i am removing folder");
+                //Console.WriteLine("i am removing folder");
                var folder = _liveContext.Folders
                .Include(x => x.UserYouTubes)
                .Include(x => x.UserImages)
@@ -207,7 +207,7 @@ namespace Live.Repositories
 
         public async Task<object> AddEntityToFolder(Guid userId, string folderId, string entityId, string entityType)
         {
-                Console.WriteLine("FOLDER ID!:  "+ folderId);
+                //Console.WriteLine("FOLDER ID!:  "+ folderId);
 
             Folder folder = null;
             

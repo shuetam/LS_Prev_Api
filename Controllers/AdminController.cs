@@ -99,8 +99,8 @@ namespace Live.Controllers
         [HttpPost("deleteyoutube")]
         public async Task <IActionResult> DeleteByYouTubeId([FromBody]EditYoutube youTube)
         {
-            Console.WriteLine("youTube.youTubeId");
-            Console.WriteLine(youTube.youTubeId);
+            //Console.WriteLine("youTube.youTubeId");
+            //Console.WriteLine(youTube.youTubeId);
              await _songRepository.DeleteByYouTubeId(youTube.youTubeId);
              await _movieRepository.DeleteByYouTubeId(youTube.youTubeId);
              return Json(youTube.youTubeId);

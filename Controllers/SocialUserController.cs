@@ -49,7 +49,9 @@ namespace Live.Controllers
             }
             catch(Exception e)
             {
-                Console.WriteLine(e.Message);
+                Log.Error($"Auth response Error: {e.Message}");
+                Log.Error(e.StackTrace);
+                //Console.WriteLine(e.Message);
                 return json;
             }
         }
@@ -103,7 +105,7 @@ namespace Live.Controllers
                     }
                     catch(Exception e)
                     {
-                        Console.WriteLine(e.Message);
+                        //Console.WriteLine(e.Message);
                         Log.Error($"Facebook login Error: {e.Message}");
                         Log.Error(e.StackTrace);
                         return Json(error);

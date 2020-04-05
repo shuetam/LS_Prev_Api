@@ -123,7 +123,7 @@ namespace Live.Repositories
 
         if(exists is null)
         {
-            Console.WriteLine(moviesCount);
+            //Console.WriteLine(moviesCount);
 
             var archiveMovie = await GetByNameFromArchive(movie.TrailerSearch);
                 if(archiveMovie is null)
@@ -152,7 +152,7 @@ namespace Live.Repositories
                     //await _liveContext.Songs.AddAsync(movie);
 
                 var rating = movie.getFilwebRating();
-                Console.WriteLine(movie.Title + "  " + movie.YouTube.VideoID);
+                //Console.WriteLine(movie.Title + "  " + movie.YouTube.VideoID);
                 await _liveContext.TVMovies.AddAsync(movie);
                 await _liveContext.SaveChangesAsync();
                 moviesCount = moviesCount-1;
@@ -164,7 +164,7 @@ namespace Live.Repositories
 
         var errors = allMovies.Where(x => x.YouTube.VideoID.Contains("Error")).ToList();
         Log.Information($"Finish TV movies update with {errors.Count} youtube errors");
-        Console.WriteLine("-----------------------FINISH UPDATE----------------------");
+        //Console.WriteLine("-----------------------FINISH UPDATE----------------------");
 }
 
             async Task<List<TVMovie>> GetMoviesForTvStationAsync(string url, string day)
@@ -219,7 +219,7 @@ namespace Live.Repositories
                             var nextDay = true;
                             if(restHours.Count>0)
                             {
-                               Console.WriteLine(restHours[0]);
+                               //Console.WriteLine(restHours[0]);
                                  nextDay = restHours.All(x => x<700);
                             }
 
@@ -245,8 +245,8 @@ namespace Live.Repositories
                     }
                     catch(Exception ex)
                     {
-                        Console.WriteLine("Something wrong in program --> " + url);
-                        Console.WriteLine(ex.Message);
+                        //Console.WriteLine("Something wrong in program --> " + url);
+                        //Console.WriteLine(ex.Message);
 
                         Log.Error($"Something wrong with program: {url}");
                         Log.Error(ex.Message);

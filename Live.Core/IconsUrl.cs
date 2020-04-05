@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using System.IO;
 using HtmlAgilityPack;
+using Serilog;
 
 namespace Live.Core
 {
@@ -36,6 +37,8 @@ namespace Live.Core
         {
             var icons = new List<IconDto>();
 
+        try 
+        {
             string patternYT1 = "watch[?]{1}v[=]{1}([^&]+)";
             string patternYT2 = "youtu.be[/]{1}([^&]+)";
 
@@ -101,13 +104,7 @@ namespace Live.Core
 
                     await Task.Run(() =>
                     {
-                        try{
                         htmlCode = client.DownloadString(imgAddress);
-                        }
-                        catch
-                        {  
-                        }
-
                     });
                    // Console.WriteLine(htmlCode);
                     
@@ -162,8 +159,7 @@ namespace Live.Core
             {
                 var mainHTML = new HtmlDocument();
                 string host = "";
-                try
-                {   
+
                     WebClient client = new WebClient(){ Encoding = System.Text.Encoding.UTF8 };
                     string htmlCode = "";
 
@@ -190,22 +186,12 @@ namespace Live.Core
 
                     var list = new List<string>();
 
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e.Message);
-                }
-
-
-
+                
                 if (mainHTML.DocumentNode.SelectNodes("//img") != null)
                 {
 
                     var src = "";
-                    try
-                    {
-
-                        var httpReg = new Regex("^http[s]?[:]{1}[/]{1}[/]{1}");
+                    var httpReg = new Regex("^http[s]?[:]{1}[/]{1}[/]{1}");
 
                         //var wwwReg = new Regex("^www[.]{1}");
 
@@ -229,16 +215,17 @@ namespace Live.Core
 
                             }
                         }
-                    }
-                    catch (Exception e)
-                    {
-                        Console.WriteLine("---------------------");
-                        Console.WriteLine(src);
-                        Console.WriteLine("---------------------");
-                    }
+                    
+                   
 
                 }
             }
+        }
+        catch(Exception ex)
+        {
+            Log.Error($"Error in adding icon: {ex.Message}");
+            Log.Error(ex.StackTrace);
+        }
             return icons;
 
         }

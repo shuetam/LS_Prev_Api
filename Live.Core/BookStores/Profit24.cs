@@ -74,11 +74,12 @@ namespace Live.Live.Core.BookStores
                     var book = new Book(title, author, src, "Profit24");
                     await book.SetSizeAsync();
                     bookList.Add(book);
-                Console.WriteLine(book.Title);
+                //Console.WriteLine(book.Title);
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine(e.Message);
+                    //Console.WriteLine(e.Message);
+                    Log.Error($"Error in Profit24: {e.Message}");
                      Log.Error(e.StackTrace);
                 }
             }

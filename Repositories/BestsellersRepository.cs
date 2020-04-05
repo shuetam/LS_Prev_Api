@@ -29,11 +29,6 @@ namespace Live.Repositories
             
             var unknown = bestSellers.Where(x => x.Title.Contains('�'));
 
-            foreach(var unk in unknown)
-            {
-                Console.WriteLine(unk.Title);
-            }
-
             int maxIndex = bestSellers.Select(x => x.GroupNo).Max();
             var books = new List<IconDto>();
 
@@ -91,7 +86,7 @@ namespace Live.Repositories
                 }
             }
             await _liveContext.SaveChangesAsync();
-            Console.WriteLine("========Finish book update==========");
+           // Console.WriteLine("========Finish book update==========");
 
         }
     }

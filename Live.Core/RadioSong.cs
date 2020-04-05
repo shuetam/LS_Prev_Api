@@ -175,7 +175,7 @@ namespace Live.Core
          string pattern = "watch[?]{1}v[=]{1}([^\"]+)[\"]{1}";
          var reg = new Regex(pattern);
          string ID = reg.Matches(htmlCode).Select(s => s.Groups[1].Value).ToArray()[0];
-         Console.WriteLine(ID);
+         //Console.WriteLine(ID);
          this.YouTubeId = ID;
         }
 

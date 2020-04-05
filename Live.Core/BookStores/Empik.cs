@@ -73,7 +73,7 @@ namespace Live.Live.Core.BookStores
                     var book = new Book(title, author, img, "Empik");
                     await book.SetSizeAsync();
                     bookList.Add(book);
-                    Console.WriteLine(book.Title);
+                    //Console.WriteLine(book.Title);
                 }
                 catch (Exception e)
                 {

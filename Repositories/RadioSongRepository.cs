@@ -118,7 +118,7 @@ namespace Live.Repositories
         public async Task SetYouTubeIdAsync(int from, int to)
         {
             var all_songs =  await _liveContext.RadioSongs.ToListAsync();
-            Console.WriteLine(all_songs.Count);
+            //Console.WriteLine(all_songs.Count);
             var songs = all_songs.Where(x => all_songs.IndexOf(x)> from && all_songs.IndexOf(x)<to);
 
             foreach(var s in songs)
@@ -174,7 +174,7 @@ public async Task UpdateAsync()
                     
                     if(count>0)
                     {
-                        Console.WriteLine(song+"------"+station+"-----"+count);
+                        //Console.WriteLine(song+"------"+station+"-----"+count);
                         song_to_data.setCount(station,count);
                     }
 

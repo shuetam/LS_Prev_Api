@@ -28,7 +28,7 @@ namespace Live.Core
 
             
   /*   var hours = (DateTime.Now - myDate).TotalHours;
-    Console.WriteLine(hours); */
+    //Console.WriteLine(hours); */
 
 
               for (int j = 0;j<24;j++)
@@ -38,12 +38,7 @@ namespace Live.Core
                     var dateBase = dateNow.AddHours(-j-1);
                     var date = dateNow.AddHours(-j-1).ToString("dd-MM-yyyy");
                     var hourFrom = dateNow.AddHours(-j-1).Hour;
-                foreach(var s in stations)
-                {
-                    string addres = "https://www.odsluchane.eu/szukaj.php?r="+s+"&date="+date+"&time_from="+hourFrom+"&time_to="+hourTo;
-                    Console.WriteLine(dateBase);
-                    Console.WriteLine(addres);
-                }
+
 
                 }
         }

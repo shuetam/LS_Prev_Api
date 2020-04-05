@@ -66,7 +66,7 @@ if(bestBooks != null)
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine(e.Message);
+                    //Console.WriteLine(e.Message);
                     Log.Error(e.StackTrace);
                 }
             }

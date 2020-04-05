@@ -72,7 +72,7 @@ if(bestList != null)
                     var book = new Book(title, author, src, "Gandalf");
                     await book.SetSizeAsync();
                     bookList.Add(book);
-                    Console.WriteLine(book.Title);
+                    //Console.WriteLine(book.Title);
                 }
                 catch (Exception e)
                 {
